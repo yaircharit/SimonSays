@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /Assembly-CSharp.csproj
 /.vsconfig
 /SimonSays_MoonActive.sln
+*.csproj
