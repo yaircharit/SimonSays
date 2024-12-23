@@ -21,6 +21,13 @@ namespace ConfigurationLoader
         /// Initializes a new instance of the <see cref="ConfigLoader"/> class.
         /// </summary>
         /// <param name="configPath">The path to the configuration file.</param>
+        /// <exception cref="FileNotFoundException">Thrown when the configuration file could not be found.</exception>
+        /// <exception cref="IOException">Thrown when an I/O error occurs while opening the configuration file.</exception>
+        /// <exception cref="UnauthorizedAccessException">Thrown when the caller does not have the required permission to access the configuration file.</exception>
+        /// <exception cref="ArgumentException">Thrown when the path is invalid.</exception>
+        /// <exception cref="PathTooLongException">Thrown when the specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
+        /// <exception cref="NotSupportedException">Thrown when the path is in an invalid format.</exception>
         public ConfigLoader(string configPath)
         {
             data = new Dictionary<string, Dictionary<string, object>>();

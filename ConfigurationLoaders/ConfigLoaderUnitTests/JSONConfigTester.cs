@@ -9,6 +9,7 @@ namespace ConfigLoaderUnitTests
     public sealed class JSONConfigTester
     {
         private const string ConfigFilePath = "../../../config.json";
+        private const string NonCompConfigFilePath = "../../../non_compatible_config.json";
         private const string NonExistingConfigFilePath = "non_existing_config.json";
         private ConfigLoader configLoader = null!;
 
@@ -74,13 +75,22 @@ namespace ConfigLoaderUnitTests
         }
 
         /// <summary>
-        /// Tests loading a non-existing configuration file and expects an InvalidOperationException.
+        /// Tests loading a non-existing configuration file and expects an FileNotFoundException.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(FileNotFoundException))]
+        public void TestLoadNonExistingFile()
+        {
+            new JSONConfigLoader(NonExistingConfigFilePath);
+        }
+        /// <summary>
+        /// Tests loading a non-compatible JSON file and expects a InvalidOperationException.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void TestLoadNonExistingFile()
+        public void TestLoadNonCompatibleJsonFile()
         {
-            var nonExistingConfigLoader = new JSONConfigLoader(NonExistingConfigFilePath);
+            new JSONConfigLoader(NonCompConfigFilePath);
         }
     }
 }
