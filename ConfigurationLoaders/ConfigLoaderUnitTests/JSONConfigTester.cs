@@ -19,8 +19,7 @@ namespace ConfigLoaderUnitTests
         [TestInitialize]
         public void Setup()
         {
-            configLoader = new JSONConfigLoader(ConfigFilePath);
-            
+            configLoader = ConfigLoader.LoadConfig(ConfigFilePath);
         }
 
         /// <summary>
@@ -29,10 +28,11 @@ namespace ConfigLoaderUnitTests
         [TestMethod]
         public void TestLoad()
         {
-            Assert.IsNotNull(configLoader.GetConfiguration("Easy"));
-            Assert.IsNotNull(configLoader.GetConfiguration("Medium"));
-            Assert.IsNotNull(configLoader.GetConfiguration("Hard"));
-            Assert.IsNull(configLoader.GetConfiguration("Extreme"));
+            var configKeys = configLoader.GetConfigurationKeys();
+            CollectionAssert.Contains(configKeys, "Easy");
+            CollectionAssert.Contains(configKeys, "Medium");
+            CollectionAssert.Contains(configKeys, "Hard");
+            CollectionAssert.DoesNotContain(configKeys, "Extreme");
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace ConfigLoaderUnitTests
         [ExpectedException(typeof(FileNotFoundException))]
         public void TestLoadNonExistingFile()
         {
-            new JSONConfigLoader(NonExistingConfigFilePath);
+            ConfigLoader.LoadConfig(NonExistingConfigFilePath);
         }
         /// <summary>
         /// Tests loading a non-compatible JSON file and expects a InvalidOperationException.
@@ -90,7 +90,7 @@ namespace ConfigLoaderUnitTests
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestLoadNonCompatibleJsonFile()
         {
-            new JSONConfigLoader(NonCompConfigFilePath);
+            ConfigLoader.LoadConfig(NonCompConfigFilePath);
         }
     }
 }
