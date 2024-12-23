@@ -10,10 +10,10 @@ namespace ConfigurationLoader
     /// <summary>
     /// Class responsible for loading and parsing JSON configuration files.
     /// </summary>
-    public class JSONConfigLoader : ConfigLoader
+    internal class JsonConfigLoader : ConfigLoader
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="JSONConfigLoader"/> class.
+        /// Initializes a new instance of the <see cref="JsonConfigLoader"/> class.
         /// </summary>
         /// <param name="configPath">The path to the JSON configuration file.</param>
         /// <exception cref="FileNotFoundException">Thrown when the configuration file could not be found.</exception>
@@ -24,7 +24,7 @@ namespace ConfigurationLoader
         /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
         /// <exception cref="NotSupportedException">Thrown when the path is in an invalid format.</exception>
         /// <exception cref="JsonException">Thrown when the JSON data cannot be deserialized.</exception>
-        public JSONConfigLoader(string configPath) : base(configPath)
+        internal JsonConfigLoader(string configPath) : base(configPath)
         {
         }
 
