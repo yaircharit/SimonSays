@@ -26,21 +26,22 @@ namespace ConfigurationLoader
         {
             try
             {
-                var xDoc = XDocument.Parse(rawData);
+                var xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(rawData);
 
                 // Check if the XML document has a root element
-                if ( xDoc.Root == null )
+                if ( xmlDoc.DocumentElement == null )
                 {
                     throw new InvalidOperationException("The XML document is missing a root element.");
                 }
 
                 // Iterate through each child node of the root element
-                foreach ( var section in xDoc.Root.Elements() )
+                foreach ( XmlNode section in xmlDoc.DocumentElement.ChildNodes )
                 {
-                    var serializer = new XmlSerializer(typeof(T), new XmlRootAttribute(section.Name.LocalName));
-                    using ( var reader = new StringReader(section.ToString()) )
+                    var serializer = new XmlSerializer(typeof(T), new XmlRootAttribute(section.Name));
+                    using ( var reader = new StringReader(section.OuterXml) )
                     {
-                        // Deserialize the XML element into a T object
+                        // Deserialize the XML node into a Configuration object
                         var configuration = (T)serializer.Deserialize(reader);
                         if ( configuration == null )
                         {
@@ -48,7 +49,7 @@ namespace ConfigurationLoader
                         }
 
                         // Add the configuration to the dictionary
-                        Data[section.Name.LocalName] = configuration;
+                        Data[section.Name] = configuration;
                     }
                 }
             }
