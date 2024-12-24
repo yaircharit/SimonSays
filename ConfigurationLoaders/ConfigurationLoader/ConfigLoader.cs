@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Newtonsoft.Json;
+using System.Globalization;
 
 namespace ConfigurationLoader
 {
@@ -15,7 +16,9 @@ namespace ConfigurationLoader
         /// <summary>
         /// Dictionary to hold configuration data.
         /// </summary>
-        protected Dictionary<string, Dictionary<string, object>> data;
+        public Dictionary<string, Configuration> Data { get; protected set; }
+
+        public static ConfigLoader? Instance { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigLoader"/> class.
@@ -28,9 +31,10 @@ namespace ConfigurationLoader
         /// <exception cref="PathTooLongException">Thrown when the specified path, file name, or both exceed the system-defined maximum length.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
         /// <exception cref="NotSupportedException">Thrown when the path is in an invalid format.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the raw data cannot be deserialized.</exception>
         protected ConfigLoader(string configPath)
         {
-            data = new Dictionary<string, Dictionary<string, object>>();
+            Data = new Dictionary<string, Configuration>();
             this.configPath = configPath;
 
             ReadConfigurationFile();
@@ -46,6 +50,7 @@ namespace ConfigurationLoader
         /// <exception cref="PathTooLongException">Thrown when the specified path, file name, or both exceed the system-defined maximum length.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
         /// <exception cref="NotSupportedException">Thrown when the path is in an invalid format.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the data cannot be deserialized.</exception>
         private void ReadConfigurationFile()
         {
             // Read the raw data from the configuration file.
@@ -58,48 +63,8 @@ namespace ConfigurationLoader
         /// Parses the raw data from the configuration file and populates the configuration dictionary.
         /// </summary>
         /// <param name="rawData">The raw data as a string.</param>
+        /// <exception cref="InvalidOperationException">Thrown when the raw data cannot be deserialized.</exception>
         protected abstract void ParseRawData(string rawData);
-
-        /// <summary>
-        /// Gets the configuration dictionary for a given key.
-        /// </summary>
-        /// <param name="key">The key of the configuration.</param>
-        /// <returns>A dictionary containing the configuration, or null if the key does not exist.</returns>
-        private Dictionary<string, object>? GetConfiguration(string key)
-        {
-            if ( data.ContainsKey(key) )
-            {
-                return data[key];
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Gets a list of all configuration keys.
-        /// </summary>
-        /// <returns>A list of all configuration keys.</returns>
-        public List<string> GetConfigurationKeys()
-        {
-            return data.Keys.ToList();
-        }
-
-        /// <summary>
-        /// Gets a value of type <typeparamref name="T"/> from the configuration.
-        /// </summary>
-        /// <typeparam name="T">The type of the value to retrieve.</typeparam>
-        /// <param name="configurationName">The name of the configuration.</param>
-        /// <param name="key">The key of the value within the configuration.</param>
-        /// <returns>The value of type <typeparamref name="T"/>, or the default value of <typeparamref name="T"/> if the key does not exist.</returns>
-        public T? GetValue<T>(string configurationName, string key)
-        {
-            var configuration = GetConfiguration(configurationName);
-            if ( configuration != null && configuration.ContainsKey(key) )
-            {
-                return (T)Convert.ChangeType(configuration[key], typeof(T), CultureInfo.InvariantCulture);
-            }
-
-            return default(T);
-        }
 
         /// <summary>
         /// Loads the appropriate configuration loader based on the file extension.
@@ -107,17 +72,21 @@ namespace ConfigurationLoader
         /// <param name="configPath">The path to the configuration file.</param>
         /// <returns>An instance of a <see cref="ConfigLoader"/>.</returns>
         /// <exception cref="ArgumentException">Thrown when the configuration file format is unsupported.</exception>
-        public static ConfigLoader LoadConfig(string configPath)
+        /// <exception cref="InvalidOperationException">Thrown when the raw data cannot be deserialized.</exception>
+        public static Dictionary<string, Configuration> LoadConfig(string configPath)
         {
             switch ( Path.GetExtension(configPath).ToLowerInvariant() )
             {
                 case ".json":
-                    return new JsonConfigLoader(configPath);
+                    Instance = new JsonConfigLoader(configPath);
+                    break;
                 case ".xml":
-                    return new XMLConfigLoader(configPath);
+                    Instance = new XMLConfigLoader(configPath);
+                    break;
                 default:
                     throw new ArgumentException("Unsupported configuration file format.");
             }
+            return Instance.Data;
         }
     }
 }

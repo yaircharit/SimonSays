@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace ConfigurationLoader
 {
@@ -15,15 +17,7 @@ namespace ConfigurationLoader
         /// <summary>
         /// Initializes a new instance of the <see cref="XMLConfigLoader"/> class.
         /// </summary>
-        /// <param name="configPath">The path to the XML configuration file.</param>
-        /// <exception cref="FileNotFoundException">Thrown when the configuration file could not be found.</exception>
-        /// <exception cref="IOException">Thrown when an I/O error occurs while opening the configuration file.</exception>
-        /// <exception cref="UnauthorizedAccessException">Thrown when the caller does not have the required permission to access the configuration file.</exception>
-        /// <exception cref="ArgumentException">Thrown when the path is invalid.</exception>
-        /// <exception cref="PathTooLongException">Thrown when the specified path, file name, or both exceed the system-defined maximum length.</exception>
-        /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
-        /// <exception cref="NotSupportedException">Thrown when the path is in an invalid format.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the JSON data cannot be deserialized.</exception>
+        /// <param name="configPath">The path to the configuration file.</param>
         internal XMLConfigLoader(string configPath) : base(configPath)
         {
         }
@@ -32,7 +26,7 @@ namespace ConfigurationLoader
         /// Parses the raw XML data and populates the configuration dictionary.
         /// </summary>
         /// <param name="rawData">The raw XML data as a string.</param>
-        /// <exception cref="InvalidOperationException">Thrown when the XML data cannot be parsed.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the raw data cannot be deserialized.</exception>
         protected override void ParseRawData(string rawData)
         {
             try
@@ -40,21 +34,33 @@ namespace ConfigurationLoader
                 var xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(rawData);
 
-                // Iterate through each section in the XML document
+                // Check if the XML document has a root element
+                if ( xmlDoc.DocumentElement == null )
+                {
+                    throw new InvalidOperationException("The XML document is missing a root element.");
+                }
+
+                // Iterate through each child node of the root element
                 foreach ( XmlNode section in xmlDoc.DocumentElement.ChildNodes )
                 {
-                    var sectionData = new Dictionary<string, object>();
-                    // Iterate through each node in the section
-                    foreach ( XmlNode node in section.ChildNodes )
+                    var serializer = new XmlSerializer(typeof(Configuration));
+                    using ( var reader = new StringReader(section.OuterXml) )
                     {
-                        sectionData[node.Name] = node.InnerText;
+                        // Deserialize the XML node into a Configuration object
+                        var configuration = (Configuration?)serializer.Deserialize(reader);
+                        if ( configuration == null )
+                        {
+                            throw new InvalidOperationException($"Failed to deserialize configuration for section {section.Name}.");
+                        }
+
+                        // Add the configuration to the dictionary
+                        Data[configuration.Name] = configuration;
                     }
-                    data[section.Name] = sectionData;
                 }
             }
-            catch ( XmlException e )
+            catch ( Exception ex )
             {
-                throw new InvalidOperationException("Failed to parse XML data.", e);
+                throw new InvalidOperationException("Failed to parse XML data.", ex);
             }
         }
     }

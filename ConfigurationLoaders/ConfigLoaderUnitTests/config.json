@@ -1,23 +1,26 @@
-{
-	"Easy": {
+[
+	{
+		"Name": "Easy",
 		"GameButtons": 4,
 		"PointsEachStep": 1,
 		"GameTime": 50,
 		"RepeatMode": true,
 		"GameSpeed": 1.0
 	},
-	"Medium": {
+	{
+		"Name": "Medium",
 		"GameButtons": 5,
 		"PointsEachStep": 2,
 		"GameTime": 45,
 		"RepeatMode": true,
 		"GameSpeed": 1.25
 	},
-	"Hard": {
+	{
+		"Name": "Hard",
 		"GameButtons": 6,
 		"PointsEachStep": 3,
 		"GameTime": 30,
 		"RepeatMode": false,
 		"GameSpeed": 1.5
 	}
-}
+]

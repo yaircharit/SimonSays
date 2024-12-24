@@ -16,13 +16,6 @@ namespace ConfigurationLoader
         /// Initializes a new instance of the <see cref="JsonConfigLoader"/> class.
         /// </summary>
         /// <param name="configPath">The path to the JSON configuration file.</param>
-        /// <exception cref="FileNotFoundException">Thrown when the configuration file could not be found.</exception>
-        /// <exception cref="IOException">Thrown when an I/O error occurs while opening the configuration file.</exception>
-        /// <exception cref="UnauthorizedAccessException">Thrown when the caller does not have the required permission to access the configuration file.</exception>
-        /// <exception cref="ArgumentException">Thrown when the path is invalid.</exception>
-        /// <exception cref="PathTooLongException">Thrown when the specified path, file name, or both exceed the system-defined maximum length.</exception>
-        /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
-        /// <exception cref="NotSupportedException">Thrown when the path is in an invalid format.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the JSON data cannot be deserialized.</exception>
         internal JsonConfigLoader(string configPath) : base(configPath)
         {
@@ -37,13 +30,17 @@ namespace ConfigurationLoader
         {
             try
             {
-                // Deserialize the raw JSON data into a dictionary
-                var deserializedData = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(rawData);
+                // Deserialize the raw JSON data into a list of Configuration objects
+                var deserializedData = JsonConvert.DeserializeObject<List<Configuration>>(rawData);
 
                 // Check if deserialization was successful
                 if ( deserializedData != null )
                 {
-                    data = deserializedData;
+                    // Add each configuration item to the dictionary
+                    foreach ( var configurationItem in deserializedData )
+                    {
+                        Data[configurationItem.Name] = configurationItem;
+                    }
                 }
             }
             catch ( JsonException e )
