@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace ConfigurationLoader
@@ -12,10 +7,10 @@ namespace ConfigurationLoader
     /// <summary>
     /// Class responsible for loading and parsing XML configuration files.
     /// </summary>
-    internal class XMLConfigLoader : ConfigLoader
+    internal class XMLConfigLoader<T> : ConfigLoader<T> where T : class
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="XMLConfigLoader"/> class.
+        /// Initializes a new instance of the <see cref="XMLConfigLoader{T}"/> class.
         /// </summary>
         /// <param name="configPath">The path to the configuration file.</param>
         internal XMLConfigLoader(string configPath) : base(configPath)
@@ -31,30 +26,29 @@ namespace ConfigurationLoader
         {
             try
             {
-                var xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(rawData);
+                var xDoc = XDocument.Parse(rawData);
 
                 // Check if the XML document has a root element
-                if ( xmlDoc.DocumentElement == null )
+                if ( xDoc.Root == null )
                 {
                     throw new InvalidOperationException("The XML document is missing a root element.");
                 }
 
                 // Iterate through each child node of the root element
-                foreach ( XmlNode section in xmlDoc.DocumentElement.ChildNodes )
+                foreach ( var section in xDoc.Root.Elements() )
                 {
-                    var serializer = new XmlSerializer(typeof(Configuration));
-                    using ( var reader = new StringReader(section.OuterXml) )
+                    var serializer = new XmlSerializer(typeof(T), new XmlRootAttribute(section.Name.LocalName));
+                    using ( var reader = new StringReader(section.ToString()) )
                     {
-                        // Deserialize the XML node into a Configuration object
-                        var configuration = (Configuration?)serializer.Deserialize(reader);
+                        // Deserialize the XML element into a T object
+                        var configuration = (T)serializer.Deserialize(reader);
                         if ( configuration == null )
                         {
                             throw new InvalidOperationException($"Failed to deserialize configuration for section {section.Name}.");
                         }
 
                         // Add the configuration to the dictionary
-                        Data[configuration.Name] = configuration;
+                        Data[section.Name.LocalName] = configuration;
                     }
                 }
             }

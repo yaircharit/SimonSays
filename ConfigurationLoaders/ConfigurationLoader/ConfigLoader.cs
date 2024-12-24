@@ -1,12 +1,9 @@
-﻿using Newtonsoft.Json;
-using System.Globalization;
-
-namespace ConfigurationLoader
+﻿namespace ConfigurationLoader
 {
     /// <summary>
     /// Abstract class representing a configuration loader.
     /// </summary>
-    public abstract class ConfigLoader
+    public abstract class ConfigLoader<T> where T : class
     {
         /// <summary>
         /// Path to the configuration file.
@@ -16,9 +13,9 @@ namespace ConfigurationLoader
         /// <summary>
         /// Dictionary to hold configuration data.
         /// </summary>
-        public Dictionary<string, Configuration> Data { get; protected set; }
+        public Dictionary<string, T> Data { get; protected set; }
 
-        public static ConfigLoader? Instance { get; private set; }
+        public static ConfigLoader<T> Instance { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigLoader"/> class.
@@ -34,7 +31,7 @@ namespace ConfigurationLoader
         /// <exception cref="InvalidOperationException">Thrown when the raw data cannot be deserialized.</exception>
         protected ConfigLoader(string configPath)
         {
-            Data = new Dictionary<string, Configuration>();
+            Data = new Dictionary<string, T>();
             this.configPath = configPath;
 
             ReadConfigurationFile();
@@ -73,15 +70,15 @@ namespace ConfigurationLoader
         /// <returns>An instance of a <see cref="ConfigLoader"/>.</returns>
         /// <exception cref="ArgumentException">Thrown when the configuration file format is unsupported.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the raw data cannot be deserialized.</exception>
-        public static Dictionary<string, Configuration> LoadConfig(string configPath)
+        public static Dictionary<string, T> LoadConfig(string configPath)
         {
             switch ( Path.GetExtension(configPath).ToLowerInvariant() )
             {
                 case ".json":
-                    Instance = new JsonConfigLoader(configPath);
+                    Instance = new JsonConfigLoader<T>(configPath);
                     break;
                 case ".xml":
-                    Instance = new XMLConfigLoader(configPath);
+                    Instance = new XMLConfigLoader<T>(configPath);
                     break;
                 default:
                     throw new ArgumentException("Unsupported configuration file format.");

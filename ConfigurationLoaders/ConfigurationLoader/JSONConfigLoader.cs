@@ -1,16 +1,11 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConfigurationLoader
 {
     /// <summary>
     /// Class responsible for loading and parsing JSON configuration files.
     /// </summary>
-    internal class JsonConfigLoader : ConfigLoader
+    internal class JsonConfigLoader<T> : ConfigLoader<T> where T : class
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonConfigLoader"/> class.
@@ -31,16 +26,13 @@ namespace ConfigurationLoader
             try
             {
                 // Deserialize the raw JSON data into a list of Configuration objects
-                var deserializedData = JsonConvert.DeserializeObject<List<Configuration>>(rawData);
+                var deserializedData = JsonConvert.DeserializeObject<Dictionary<string,T>>(rawData);
 
                 // Check if deserialization was successful
                 if ( deserializedData != null )
                 {
                     // Add each configuration item to the dictionary
-                    foreach ( var configurationItem in deserializedData )
-                    {
-                        Data[configurationItem.Name] = configurationItem;
-                    }
+                    Data = deserializedData;
                 }
             }
             catch ( JsonException e )
