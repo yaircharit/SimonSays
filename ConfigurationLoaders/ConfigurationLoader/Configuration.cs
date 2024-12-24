@@ -8,7 +8,7 @@ namespace ConfigurationLoader
 {
     public class Configuration
     {
-        public string? Name { get; set; }
+        public required string Name { get; set; }
         public int GameButtons { get; set; }
         public int PointsEachStep { get; set; }
         public int GameTime { get; set; }
