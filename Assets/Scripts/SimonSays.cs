@@ -12,6 +12,7 @@ public class SimonSays : MonoBehaviour
 
     public string configName;
     public GameObject buttonPrefab;
+    public float buttonsRadius = 2.7f;
 
     private AppConfig config;
     private GameButton[] buttons;
@@ -22,10 +23,15 @@ public class SimonSays : MonoBehaviour
         config = ConfigLoader<AppConfig>.LoadConfig(ConfigPath)[configName]; // TODO: Load in homescreen and pass to this scene
 
         buttons = new GameButton[config.GameButtons];
+        float angleStep = 360.0f / config.GameButtons;
+        Vector3 pos = new Vector3();
 
         for ( int i = 0; i < config.GameButtons; i++ )
         {
-            buttons[i] = Instantiate(buttonPrefab, new Vector3(i, 0, 0), Quaternion.identity, transform).GetComponent<GameButton>();
+            float angle = i * angleStep * Mathf.Deg2Rad; // Convert angle to radians
+            pos.x = Mathf.Cos(angle) * buttonsRadius;
+            pos.y = Mathf.Sin(angle) * buttonsRadius;
+            buttons[i] = Instantiate(buttonPrefab, pos, Quaternion.identity, transform).GetComponent<GameButton>();
         }
     }
 

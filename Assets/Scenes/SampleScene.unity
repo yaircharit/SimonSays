@@ -155,6 +155,7 @@ MonoBehaviour:
   configFileName: config.json
   configName: Easy
   buttonPrefab: {fileID: 4031909000213624415, guid: bcfc5a4b616411240a4089239e607e82, type: 3}
+  buttonsRadius: 2.7
 --- !u!4 &230589955
 Transform:
   m_ObjectHideFlags: 0
