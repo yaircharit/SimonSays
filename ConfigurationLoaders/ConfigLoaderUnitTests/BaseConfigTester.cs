@@ -12,7 +12,7 @@ namespace ConfigLoaderUnitTests
         [TestInitialize]
         public void Setup()
         {
-            configData = ConfigLoader.LoadConfig(ConfigFilePath);
+            configData = ConfigLoader<Configuration>.LoadConfig(ConfigFilePath);
         }
 
         [TestMethod]
@@ -65,14 +65,14 @@ namespace ConfigLoaderUnitTests
         [ExpectedException(typeof(FileNotFoundException))]
         public void TestLoadNonExistingFile()
         {
-            ConfigLoader.LoadConfig(NonExistingConfigFilePath);
+            ConfigLoader<Configuration>.LoadConfig(NonExistingConfigFilePath);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestLoadNonCompatibleFile()
         {
-            ConfigLoader.LoadConfig(NonCompConfigFilePath);
+            ConfigLoader<Configuration>.LoadConfig(NonCompConfigFilePath);
         }
     }
 }
