@@ -13,6 +13,7 @@ public class SimonSays : MonoBehaviour
     public string configName;
     public GameObject buttonPrefab;
     public float buttonsRadius = 2.7f;
+    public AudioClip[] sounds;
 
     private AppConfig config;
     private GameButton[] buttons;
@@ -35,9 +36,4 @@ public class SimonSays : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

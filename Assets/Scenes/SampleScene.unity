@@ -156,6 +156,13 @@ MonoBehaviour:
   configName: Easy
   buttonPrefab: {fileID: 4031909000213624415, guid: bcfc5a4b616411240a4089239e607e82, type: 3}
   buttonsRadius: 2.7
+  sounds:
+  - {fileID: 8300000, guid: ee423f88a0b5b440abed9e47310304b4, type: 3}
+  - {fileID: 8300000, guid: 84949ccbe2c884d05b79138199c9df29, type: 3}
+  - {fileID: 8300000, guid: ad90fea341452440c8e730a2cd8fa6c9, type: 3}
+  - {fileID: 8300000, guid: 3839948ccab1245b19ba28f82adee854, type: 3}
+  - {fileID: 8300000, guid: 65ce83a911bc548ba820270019172b55, type: 3}
+  - {fileID: 8300000, guid: a78b52f49b045427099e648585ee4b06, type: 3}
 --- !u!4 &230589955
 Transform:
   m_ObjectHideFlags: 0
