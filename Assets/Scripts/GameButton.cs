@@ -10,9 +10,7 @@ public class GameButton : MonoBehaviour
 {
     private static Color[] buttonColors = { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan };
     private static int buttonCount = 0;
-    
 
-    public float buttonDelay = 1f;
     public float colorCoefficient = 0.75f;
     public Sprite buttonSprite;
     public Sprite pressedButtonSprite;
@@ -29,10 +27,15 @@ public class GameButton : MonoBehaviour
         color = buttonColors[index] * colorCoefficient;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.color = color ;
+        spriteRenderer.color = color;
 
         audioSource = GetComponent<AudioSource>();
         audioSource.clip = GetComponentInParent<SimonSays>().sounds[index];
+    }
+
+    private void OnDestroy()
+    {
+        buttonCount--;
     }
 
     public void OnMouseDown()
