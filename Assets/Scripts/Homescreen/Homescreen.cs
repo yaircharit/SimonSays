@@ -22,6 +22,7 @@ public class Homescreen : MonoBehaviour
 
     public GameObject difficultyButtonPrefab;
     private Dictionary<string, Button> difficultyButtons = new Dictionary<string, Button>();
+    private Color selectedColor;
 
     public string configFileName = "config.json";
     private string ConfigPath => $"{Application.dataPath}/Configs/{configFileName}";
@@ -70,7 +71,8 @@ public class Homescreen : MonoBehaviour
         {
             // Highlight playerNameInput with a red border
             playerNameInput.GetComponent<Image>().color = Color.red;
-            EventSystem.current.SetSelectedGameObject(playerNameInput.gameObject);
+            playerNameInput.Select();
+            //TODO: keep configButton highlightet
             return;
         }
 
