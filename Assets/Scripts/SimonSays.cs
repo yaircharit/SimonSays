@@ -20,7 +20,7 @@ public class SimonSays : MonoBehaviour
     public TextMeshProUGUI timeTextObject;
     public Button exitButton;
 
-    private AppConfig config => Homescreen.selectedConfig;
+    private AppConfig config => Homescreen.SelectedConfig;
     private GameButton[] gameButtons;
     private bool isLoading = true;
     private bool isPlayingSequance = false;
