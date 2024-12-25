@@ -16,15 +16,17 @@ public class Homescreen : MonoBehaviour
 
     public Button leaderboardButton;
     public Button settingsButton;
+    public Button exitGameButton;
     public GameObject leaderboardWindow;
     public GameObject settingsWindow;
 
     public GameObject difficultyButtonPrefab;
-    private Dictionary<string,Button> difficultyButtons = new Dictionary<string, Button>();
+    private Dictionary<string, Button> difficultyButtons = new Dictionary<string, Button>();
 
     public string configFileName = "config.json";
     private string ConfigPath => $"{Application.dataPath}/Configs/{configFileName}";
     public static Dictionary<string, AppConfig> configs;
+
     public static string selectedDifficulty = null;
     public static string username = "";
     public static AppConfig SelectedConfig => configs[selectedDifficulty];
@@ -39,17 +41,18 @@ public class Homescreen : MonoBehaviour
             Button tempButt = Instantiate(difficultyButtonPrefab, difficultyButtonsContainer.transform).GetComponent<Button>();
             tempButt.GetComponentInChildren<TextMeshProUGUI>().text = cnf;
             tempButt.onClick.AddListener(() => SelectDifficulty(cnf));
-            difficultyButtons.Add(cnf,tempButt);
+            difficultyButtons.Add(cnf, tempButt);
         }
         // Select the first difficulty by default or apply the difficulty from last game
-        SelectDifficulty((selectedDifficulty == null)? difficultyButtons.Keys.First() : selectedDifficulty);
+        SelectDifficulty((selectedDifficulty == null) ? difficultyButtons.Keys.First() : selectedDifficulty);
 
         // Add listeners to buttons (TODO: is there a better way to do this?)
         startGameButton.onClick.AddListener(StartGame);
-        leaderboardButton.onClick.AddListener(()=> OpenOverlayWindow(leaderboardWindow));
-        settingsButton.onClick.AddListener(() => OpenOverlayWindow(settingsWindow));
-        leaderboardWindow.GetComponentInChildren<Button>().onClick.AddListener(() => CloseOverlayWindow(leaderboardWindow));
-        settingsWindow.GetComponentInChildren<Button>().onClick.AddListener(() => CloseOverlayWindow(settingsWindow));
+        leaderboardButton.onClick.AddListener(() => leaderboardWindow.SetActive(true));
+        settingsButton.onClick.AddListener(() => settingsWindow.SetActive(true));
+        leaderboardWindow.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => leaderboardWindow.SetActive(false));
+        settingsWindow.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => settingsWindow.SetActive(false));
+        exitGameButton.onClick.AddListener(() => Quit());
 
         playerNameInput.text = username;
     }
@@ -75,17 +78,13 @@ public class Homescreen : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene("SimonSays");
     }
 
-    public void CloseOverlayWindow(GameObject obj)
+    public void Quit()
     {
-        obj.SetActive(false);
-        leaderboardButton.enabled = settingsButton.enabled = true;
+        #if UNITY_STANDALONE
+            Application.Quit();
+        #endif
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #endif
     }
-
-
-    public void OpenOverlayWindow(GameObject window)
-    {
-        leaderboardButton.enabled = settingsButton.enabled = false;
-        window.SetActive(true);
-    }
-
 }
