@@ -11,10 +11,6 @@ using System.Threading.Tasks;
 
 public class SimonSays : MonoBehaviour
 {
-    public string configFileName;
-    private string ConfigPath => $"{Application.dataPath}/Configs/{configFileName}";
-
-    public string configName;
     public GameObject buttonPrefab;
     public float buttonsRadius = 2.7f;
     public AudioClip[] sounds;
@@ -22,11 +18,12 @@ public class SimonSays : MonoBehaviour
     public Button nextRoundButton;
     public TextMeshProUGUI scoreTextObject;
     public TextMeshProUGUI timeTextObject;
+    public Button exitButton;
 
-    private AppConfig config;
+    private AppConfig config => Homescreen.selectedConfig;
     private GameButton[] gameButtons;
+    private bool isLoading = true;
 
-    private int roundNumber => sequence.Count;
     private int points = 0;
     private float time = 999;
     private bool isRunning = false;
@@ -38,11 +35,12 @@ public class SimonSays : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        config = ConfigLoader<AppConfig>.LoadConfig(ConfigPath)[configName];
         isRunning = false;
+        nextRoundButton.onClick.AddListener(NextRound);
+        exitButton.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("Homescreen"));
 
-
-        nextRoundButton.onClick.AddListener(StartGame);
+        StartCoroutine(SpawnButtons(config.GameButtons));
+        StartCoroutine(StartGame());
     }
 
     private void FixedUpdate()
@@ -61,9 +59,8 @@ public class SimonSays : MonoBehaviour
         }
     }
 
-    private async Task<bool> SpawnButtons(int count)
+    private IEnumerator SpawnButtons(int count)
     {
-        // TODO: when homescreen is implemented, can be moved to Start() method?
         gameButtons = new GameButton[count];
         float angleStep = 360.0f / count;
         Vector3 pos = new Vector3();
@@ -74,29 +71,23 @@ public class SimonSays : MonoBehaviour
             pos.x = Mathf.Cos(angle) * buttonsRadius;
             pos.y = Mathf.Sin(angle) * buttonsRadius;
             gameButtons[i] = Instantiate(buttonPrefab, pos, Quaternion.identity, transform).GetComponent<GameButton>();
-            await Task.Yield(); // Allow other tasks to run
+            yield return new WaitUntil(() => gameButtons[i] != null);
         }
 
-        return true;
+        isLoading = false;
     }
 
-    public void StartGame()
+    public IEnumerator StartGame()
     {
         nextRoundButton.enabled = false;
-        StartGameAsync();
-    }
-
-    public async Task StartGameAsync()
-    {
         if ( !isRunning )
         {
-           await SpawnButtons(config.GameButtons);
-
             time = config.GameTime;
             currentGameDelay = defaultGameDelay / config.GameSpeed;
             isRunning = true;
         }
-        StartCoroutine(PlaySequance());
+        yield return new WaitUntil(() => !isLoading);
+        NextRound();
     }
 
     public void EndGame()
@@ -113,11 +104,15 @@ public class SimonSays : MonoBehaviour
         //TODO: Leaderboard stuff
     }
 
+    private void NextRound()
+    {
+        nextRoundButton.enabled = false;
+        sequence.Add(rnd.Next(config.GameButtons));
+        StartCoroutine(PlaySequance());
+    }
 
     private IEnumerator PlaySequance()
     {
-        sequence.Add(rnd.Next(config.GameButtons));
-
         foreach ( var gameButton in gameButtons )
         {
             gameButton.enabled = false;
@@ -134,7 +129,9 @@ public class SimonSays : MonoBehaviour
         {
             gameButton.enabled = false;
         }
-        
+
+        HandlePlayerInput();
+
         nextRoundButton.enabled = true;
     }
 
