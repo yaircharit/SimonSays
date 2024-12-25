@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -21,7 +19,7 @@ public class GameButton : MonoBehaviour
     private AudioSource audioSource;
     private SpriteRenderer spriteRenderer;
 
-    public void Start()
+    public void Awake()
     {
         index = buttonCount++;
         color = buttonColors[index] * colorCoefficient;
@@ -30,7 +28,7 @@ public class GameButton : MonoBehaviour
         spriteRenderer.color = color;
 
         audioSource = GetComponent<AudioSource>();
-        audioSource.clip = GetComponentInParent<SimonSays>().sounds[index];
+        audioSource.clip = GetComponentInParent<ViewManager>().sounds[index];
     }
 
     private void OnDestroy()
@@ -40,8 +38,8 @@ public class GameButton : MonoBehaviour
 
     public void OnMouseDown()
     {
-        //TODO: Check if its the right button to press
         StartCoroutine(ActivateButton());
+        GameManager.Instance.CheckSequence(index);
     }
 
     public IEnumerator ActivateButton()

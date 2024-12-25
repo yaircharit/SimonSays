@@ -377,7 +377,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8100635180476407866, guid: e2c710a6900af014e9937fa766590273, type: 3}
       propertyPath: m_Name
-      value: CloseWindowButton
+      value: ExitButton
       objectReference: {fileID: 0}
     - target: {fileID: 8519783882052618640, guid: e2c710a6900af014e9937fa766590273, type: 3}
       propertyPath: m_AnchorMax.y

@@ -1,11 +1,9 @@
 using Assets.Scripts;
 using ConfigurationLoader;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Homescreen : MonoBehaviour
@@ -33,7 +31,7 @@ public class Homescreen : MonoBehaviour
     public static AppConfig SelectedConfig => configs[selectedDifficulty];
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         configs = ConfigLoader<AppConfig>.LoadConfig(ConfigPath);
 
@@ -51,8 +49,12 @@ public class Homescreen : MonoBehaviour
         startGameButton.onClick.AddListener(StartGame);
         leaderboardButton.onClick.AddListener(() => leaderboardWindow.SetActive(true));
         settingsButton.onClick.AddListener(() => settingsWindow.SetActive(true));
-        leaderboardWindow.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => leaderboardWindow.SetActive(false));
-        settingsWindow.transform.GetChild(0).GetComponent<Button>().onClick.AddListener(() => settingsWindow.SetActive(false));
+        leaderboardWindow.GetComponentsInChildren<Button>()
+            .Single((child) => child.name == "ExitButton")
+            .onClick.AddListener(() => leaderboardWindow.SetActive(false));
+        settingsWindow.GetComponentsInChildren<Button>()
+            .Single((child) => child.name == "ExitButton")
+            .onClick.AddListener(() => settingsWindow.SetActive(false));
         exitGameButton.onClick.AddListener(() => Quit());
 
         playerNameInput.text = username;
