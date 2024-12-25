@@ -15,7 +15,7 @@ public class SimonSays : MonoBehaviour
     public float buttonsRadius = 2.7f;
     public AudioClip[] sounds;
     public float defaultGameDelay = 0.8f;
-    public Button nextRoundButton;
+    public Button repeatButton;
     public TextMeshProUGUI scoreTextObject;
     public TextMeshProUGUI timeTextObject;
     public Button exitButton;
@@ -23,6 +23,7 @@ public class SimonSays : MonoBehaviour
     private AppConfig config => Homescreen.selectedConfig;
     private GameButton[] gameButtons;
     private bool isLoading = true;
+    private bool isPlayingSequance = false;
 
     private int points = 0;
     private float time = 999;
@@ -36,8 +37,11 @@ public class SimonSays : MonoBehaviour
     void Start()
     {
         isRunning = false;
-        nextRoundButton.onClick.AddListener(NextRound);
         exitButton.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("Homescreen"));
+        
+        repeatButton.onClick.AddListener(() => StartCoroutine(PlaySequance()));
+        repeatButton.gameObject.SetActive(config.RepeatMode);
+        
 
         StartCoroutine(SpawnButtons(config.GameButtons));
         StartCoroutine(StartGame());
@@ -58,7 +62,7 @@ public class SimonSays : MonoBehaviour
             }
         }
     }
-
+    
     private IEnumerator SpawnButtons(int count)
     {
         gameButtons = new GameButton[count];
@@ -79,7 +83,7 @@ public class SimonSays : MonoBehaviour
 
     public IEnumerator StartGame()
     {
-        nextRoundButton.enabled = false;
+        repeatButton.enabled = false;
         if ( !isRunning )
         {
             time = config.GameTime;
@@ -106,13 +110,15 @@ public class SimonSays : MonoBehaviour
 
     private void NextRound()
     {
-        nextRoundButton.enabled = false;
+        repeatButton.enabled = false;
         sequence.Add(rnd.Next(config.GameButtons));
         StartCoroutine(PlaySequance());
     }
 
     private IEnumerator PlaySequance()
     {
+        isPlayingSequance = true;
+        repeatButton.enabled = false;
         foreach ( var gameButton in gameButtons )
         {
             gameButton.enabled = false;
@@ -130,9 +136,8 @@ public class SimonSays : MonoBehaviour
             gameButton.enabled = false;
         }
 
-        HandlePlayerInput();
-
-        nextRoundButton.enabled = true;
+        repeatButton.enabled = true;
+        isPlayingSequance = false;
     }
 
     private void UpdateScore()
@@ -143,10 +148,11 @@ public class SimonSays : MonoBehaviour
 
     private void HandlePlayerInput()
     {
-        // TODO: wait for player to press buttons and validate sequance
-        // TODO: allow player    to repeat the sequance (if config.RepeatMode is true)
-        UpdateScore(); //TODO: Add points for each *step*, not each round
-        // TODO: if player fails, end game
-        // TODO: if player succeds, play next round
+       
+            // TODO: wait for player to press buttons and validate sequance
+            //TODO: Add points for each *step*, not each round
+            // TODO: if player fails, end game
+            // TODO: if player succeds, play next round
+
     }
 }
