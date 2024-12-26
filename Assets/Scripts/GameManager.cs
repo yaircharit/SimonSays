@@ -1,16 +1,10 @@
 using Assets.Scripts;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    public static AppConfig Config => Homescreen.SelectedConfig;
 
 
     public static bool isRunning = false;
@@ -28,7 +22,7 @@ public class GameManager : MonoBehaviour
         sequence.Clear();
         sequenceIndex = 0;
         score = 0;
-        time = Config.GameTime;
+        time = GlobalVariables.selectedConfig.GameTime;
         isRunning = true;
     }
 
@@ -49,8 +43,7 @@ public class GameManager : MonoBehaviour
                 ViewManager.Instance.UpdateTime((int)time);
             } else
             {
-                Debug.Log("Game Over!");
-                ViewManager.Instance.EndGame(true);
+                EndGame(true);
             }
         }
     }
@@ -61,7 +54,7 @@ public class GameManager : MonoBehaviour
     private void NextRound()
     {
         ViewManager.EnableButtons(false);
-        sequence.Add(rand.Next(Config.GameButtons));
+        sequence.Add(rand.Next(GlobalVariables.selectedConfig.GameButtons));
         StartCoroutine(ViewManager.Instance.PlaySequance());
     }
 
@@ -79,7 +72,7 @@ public class GameManager : MonoBehaviour
             {
                 // All sequence pressed correctly
 
-                score += Config.PointsEachStep;
+                score += GlobalVariables.selectedConfig.PointsEachStep;
                 ViewManager.Instance.UpdateScore(score);
                 sequenceIndex = 0;
 
@@ -88,7 +81,13 @@ public class GameManager : MonoBehaviour
         } else
         {
             // Wrong button pressed
-            ViewManager.Instance.EndGame(false);
+            EndGame(false);
         }
+    }
+
+    public void EndGame(bool gameWon)
+    {
+        var playerScore = Leaderboard.Instance.SaveScore(score);
+        ViewManager.Instance.EndGame(gameWon,playerScore);
     }
 }

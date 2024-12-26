@@ -1,6 +1,5 @@
 using Assets.Scripts;
 using ConfigurationLoader;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,7 +30,6 @@ public class Homescreen : MonoBehaviour
     public static Dictionary<string, AppConfig> configs;
 
     public static string selected = null;
-    public static string username = "";
     public static AppConfig SelectedConfig => configs[selected];
 
     // Start is called before the first frame update
@@ -54,17 +52,14 @@ public class Homescreen : MonoBehaviour
         defaultColor = configs.Values.First().buttonRef.GetComponent<Button>().colors.normalColor;
         selectedColor = configs.Values.First().buttonRef.GetComponent<Button>().colors.selectedColor;
 
-        // Apply username and difficulty from last game
+        // Apply player's name and difficulty from last game
         SelectDifficulty(selected ?? configs.Keys.First());
-        playerNameInput.text = username;
+        playerNameInput.text = GlobalVariables.PlayerName;
 
         // Add listeners to buttons (TODO: is there a better way to do this?)
         startGameButton.onClick.AddListener(StartGame);
-        leaderboardButton.onClick.AddListener(() => leaderboardWindow.SetActive(true));
+        leaderboardButton.onClick.AddListener(() => Leaderboard.Instance.OpenWindow());
         settingsButton.onClick.AddListener(() => settingsWindow.SetActive(true));
-        leaderboardWindow.GetComponentsInChildren<Button>()
-            .Single((child) => child.name == "ExitButton")
-            .onClick.AddListener(() => leaderboardWindow.SetActive(false));
         settingsWindow.GetComponentsInChildren<Button>()
             .Single((child) => child.name == "ExitButton")
             .onClick.AddListener(() => settingsWindow.SetActive(false));
@@ -115,8 +110,9 @@ public class Homescreen : MonoBehaviour
             return;
         }
 
-        username = playerName;
-        UnityEngine.SceneManagement.SceneManager.LoadScene("SimonSays");
+        GlobalVariables.selectedConfig = SelectedConfig;
+        GlobalVariables.PlayerName = playerName;
+        SceneManager.LoadScene("SimonSays");
     }
 
     /// <summary>

@@ -1,8 +1,21 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets.Scripts
 {
+    public static class GlobalVariables
+    {
+        public static AppConfig selectedConfig { get; set; }
+
+        private static string _playerNameKey = "playerName";
+        public static string PlayerName
+        {
+            get { return PlayerPrefs.GetString(_playerNameKey, ""); }
+            set { PlayerPrefs.SetString(_playerNameKey, value); }
+        }
+    }
+
     [Serializable]
     public class AppConfig
     {
