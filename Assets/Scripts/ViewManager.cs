@@ -1,7 +1,6 @@
 using Assets.Scripts;
 using System;
 using System.Collections;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,7 +20,6 @@ public class ViewManager : MonoBehaviour
     public Button exitButton;
     public GameObject leaderboardWindow;
 
-    private static AppConfig Config => Homescreen.SelectedConfig;
     private static GameButton[] buttons;
     private static float gameDelay;
 
@@ -33,14 +31,12 @@ public class ViewManager : MonoBehaviour
         // Add listeners to buttons
         exitButton.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("Homescreen"));
         repeatButton.onClick.AddListener(() => StartCoroutine(PlaySequance()));
-        leaderboardWindow.GetComponentsInChildren<Button>()
-            .Single((child) => child.name == "ExitButton")
-            .onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("Homescreen"));
+        
 
         // Apply selected config
-        repeatButton.gameObject.SetActive(Config.RepeatMode);
-        gameDelay = defaultGameDelay / Config.GameSpeed;
-        SpawnButtons(Config.GameButtons);
+        repeatButton.gameObject.SetActive(GlobalVariables.selectedConfig.RepeatMode);
+        gameDelay = defaultGameDelay / GlobalVariables.selectedConfig.GameSpeed;
+        SpawnButtons(GlobalVariables.selectedConfig.GameButtons);
     }
 
     /// <summary>
@@ -105,12 +101,8 @@ public class ViewManager : MonoBehaviour
         EnableButtons(true);
     }
 
-    public void EndGame(bool gameWon)
+    public void EndGame(bool gameWon, PlayerScore currentPlayerScore)
     {
-        // Open leaderboard window and highlight the current game's score
-        leaderboardWindow.GetComponentsInChildren<TextMeshProUGUI>()
-            .Single((child) => child.name == "WindowTitle")
-            .text = $"You {((gameWon) ? "Won" : "Lost")}!";
-        leaderboardWindow.SetActive(true);
+        Leaderboard.Instance.OpenWindow($"You {(gameWon ? "Won" : "Lost")}!", currentPlayerScore.Id);
     }
 }
