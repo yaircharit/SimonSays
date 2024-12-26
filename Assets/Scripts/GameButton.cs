@@ -6,7 +6,6 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class GameButton : MonoBehaviour
 {
-    private static Color[] buttonColors = { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan };
     private static int buttonCount = 0;
 
     public float colorCoefficient = 0.75f;
@@ -22,7 +21,7 @@ public class GameButton : MonoBehaviour
     public void Awake()
     {
         index = buttonCount++;
-        color = buttonColors[index] * colorCoefficient;
+        color = ViewManager.Instance.buttonColors[index] * colorCoefficient;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.color = color;
@@ -38,8 +37,11 @@ public class GameButton : MonoBehaviour
 
     public void OnMouseDown()
     {
-        StartCoroutine(ActivateButton());
-        GameManager.Instance.CheckSequence(index);
+        if ( enabled )
+        {
+            StartCoroutine(ActivateButton());
+            GameManager.Instance.CheckSequence(index);
+        }
     }
 
     public IEnumerator ActivateButton()

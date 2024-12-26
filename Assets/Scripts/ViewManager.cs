@@ -8,11 +8,12 @@ using UnityEngine.UI;
 
 public class ViewManager : MonoBehaviour
 {
-    public static ViewManager Instance;
+    public static ViewManager Instance { get; private set; }
 
     public GameObject buttonPrefab;
     public float buttonsRadius = 2.7f;
     public AudioClip[] sounds;
+    public Color[] buttonColors = { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan }; // TODO: read from style config
     public float defaultGameDelay = 0.8f;
     public Button repeatButton;
     public TextMeshProUGUI scoreTextObject;
@@ -57,7 +58,7 @@ public class ViewManager : MonoBehaviour
     /// <param name="score">New score</param>
     public void UpdateScore(int score)
     {
-        scoreTextObject.text = $"Score: {GameManager.points}";
+        scoreTextObject.text = $"Score: {GameManager.score}";
     }
 
     /// <summary>
@@ -76,19 +77,23 @@ public class ViewManager : MonoBehaviour
             pos.x = Mathf.Cos(angle) * buttonsRadius;
             pos.y = Mathf.Sin(angle) * buttonsRadius;
             buttons[i] = Instantiate(buttonPrefab, pos, Quaternion.identity, transform).GetComponent<GameButton>();
+            buttons[i].enabled = false;
         }
     }
 
+    public static void EnableButtons(bool enable)
+    {
+        Instance.repeatButton.enabled = enable;
+        Array.ForEach(buttons, (butt) => butt.enabled = enable);
+    }
 
     /// <summary>
     /// Plays the sequence of buttons. Disables buttons while playing
     /// </summary>
     public IEnumerator PlaySequance()
     {
+        EnableButtons(false);
         yield return new WaitForSeconds(gameDelay * 1.5f);
-        // disable buttons
-        repeatButton.enabled = false;
-        Array.ForEach(buttons, (butt) => butt.enabled = false);
 
         // play sequance
         foreach ( var butt in GameManager.sequence )
@@ -97,9 +102,7 @@ public class ViewManager : MonoBehaviour
             yield return new WaitForSeconds(gameDelay);
         }
 
-        // Enable buttons
-        Array.ForEach(buttons, (butt) => butt.enabled = true);
-        repeatButton.enabled = true;
+        EnableButtons(true);
     }
 
     public void EndGame(bool gameWon)

@@ -9,15 +9,13 @@ using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
+    public static GameManager Instance { get; private set; }
     public static AppConfig Config => Homescreen.SelectedConfig;
 
 
     public static bool isRunning = false;
-    public static int points = 0;
+    public static int score = 0;
     public static float time = 999;
-    
-    public float defaultGameDelay = 1.0f;
 
     public static List<int> sequence = new List<int>();
     public static int sequenceIndex = 0;
@@ -29,7 +27,7 @@ public class GameManager : MonoBehaviour
         Instance = this;
         sequence.Clear();
         sequenceIndex = 0;
-        points = 0;
+        score = 0;
         time = Config.GameTime;
         isRunning = true;
     }
@@ -62,6 +60,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void NextRound()
     {
+        ViewManager.EnableButtons(false);
         sequence.Add(rand.Next(Config.GameButtons));
         StartCoroutine(ViewManager.Instance.PlaySequance());
     }
@@ -80,8 +79,8 @@ public class GameManager : MonoBehaviour
             {
                 // All sequence pressed correctly
 
-                points += Config.PointsEachStep;
-                ViewManager.Instance.UpdateScore(points);
+                score += Config.PointsEachStep;
+                ViewManager.Instance.UpdateScore(score);
                 sequenceIndex = 0;
 
                 NextRound();

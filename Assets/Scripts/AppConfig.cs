@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using UnityEngine.UI;
+
 namespace Assets.Scripts
 {
     [Serializable]
@@ -11,5 +11,7 @@ namespace Assets.Scripts
         public int GameTime { get; set; }
         public bool RepeatMode { get; set; }
         public float GameSpeed { get; set; }
+
+        internal Button buttonRef { get; set; }
     }
 }

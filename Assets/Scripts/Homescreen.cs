@@ -1,9 +1,12 @@
 using Assets.Scripts;
 using ConfigurationLoader;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Homescreen : MonoBehaviour
@@ -19,13 +22,12 @@ public class Homescreen : MonoBehaviour
     public GameObject settingsWindow;
 
     public GameObject difficultyButtonPrefab;
-    private static Dictionary<string, Button> buttons = new Dictionary<string, Button>();
-    
+
     private static Color selectedColor;
     private static Color defaultColor;
 
-    public string configFileName = "config.json";
-    private string ConfigPath => $"{Application.dataPath}/Configs/{configFileName}";
+    public string configLocalPath = "Resources/config.json";
+    private string ConfigPath => Path.Combine(Application.dataPath, configLocalPath);
     public static Dictionary<string, AppConfig> configs;
 
     public static string selected = null;
@@ -36,22 +38,25 @@ public class Homescreen : MonoBehaviour
     void Awake()
     {
         // Load congifurations
-        configs = ConfigLoader<AppConfig>.LoadConfig(ConfigPath);
+        configs ??= ConfigLoader<AppConfig>.LoadConfig(ConfigPath);
 
         // Add and initialize difficulty buttons per config
         foreach ( var cnf in configs.Keys )
         {
-            Button tempButt = Instantiate(difficultyButtonPrefab, difficultyButtonsContainer.transform).GetComponent<Button>(); 
-            tempButt.GetComponentInChildren<TextMeshProUGUI>().text = cnf; 
+            Button tempButt = Instantiate(difficultyButtonPrefab, difficultyButtonsContainer.transform).GetComponent<Button>();
+            tempButt.GetComponentInChildren<TextMeshProUGUI>().text = cnf;
             tempButt.onClick.AddListener(() => SelectDifficulty(cnf));
-            buttons.Add(cnf, tempButt);
+
+            configs[cnf].buttonRef = tempButt;
         }
         // Save default and selected colors
-        defaultColor = buttons.Values.First().GetComponent<Button>().colors.normalColor;
-        selectedColor = buttons.Values.First().GetComponent<Button>().colors.selectedColor;
+        // TODO: read from style sheet/config
+        defaultColor = configs.Values.First().buttonRef.GetComponent<Button>().colors.normalColor;
+        selectedColor = configs.Values.First().buttonRef.GetComponent<Button>().colors.selectedColor;
 
-        // Select the first difficulty by default or apply the difficulty from last game
-        SelectDifficulty((selected == null) ? buttons.Keys.First() : selected);
+        // Apply username and difficulty from last game
+        SelectDifficulty(selected ?? configs.Keys.First());
+        playerNameInput.text = username;
 
         // Add listeners to buttons (TODO: is there a better way to do this?)
         startGameButton.onClick.AddListener(StartGame);
@@ -64,8 +69,6 @@ public class Homescreen : MonoBehaviour
             .Single((child) => child.name == "ExitButton")
             .onClick.AddListener(() => settingsWindow.SetActive(false));
         exitGameButton.onClick.AddListener(() => Quit());
-
-        playerNameInput.text = username; // Set the player name from last game or empty string
     }
 
     /// <summary>
@@ -78,13 +81,13 @@ public class Homescreen : MonoBehaviour
         {
             SetSelectedButtonNormalColor(defaultColor); // Reset the color of the previously selected button
         }
-        buttons[difficulty].Select();
+        configs[difficulty].buttonRef.Select();
         selected = difficulty;
 
         SetSelectedButtonNormalColor(selectedColor); // Highlight the selected button 
     }
 
-    
+
 
     /// <summary>
     /// Sets the normal color of the selected button
@@ -93,9 +96,9 @@ public class Homescreen : MonoBehaviour
     private void SetSelectedButtonNormalColor(Color color)
     {
         //TODO: beautify this
-        var colors = buttons[selected].GetComponent<Button>().colors;
+        var colors = configs[selected].buttonRef.GetComponent<Button>().colors;
         colors.normalColor = color;
-        buttons[selected].GetComponent<Button>().colors = colors;
+        configs[selected].buttonRef.GetComponent<Button>().colors = colors;
     }
 
     /// <summary>
