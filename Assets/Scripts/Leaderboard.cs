@@ -5,37 +5,29 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Leaderboard : MonoBehaviour
 {
-    public string databaseLocalPath = "leaderboard.db";
-    public string tableName = "Leaderboard";
     public GameObject rowPrefab;
     public TMP_Text titleTextObject;
     public GameObject rowsContainer;
     public Color hightlightColor = Color.yellow;
 
+    private static string databaseFileName;
+    private static string tableName;
     private static SqliteConnection dbConnection;
     private static List<PlayerScore> playerScores;
     private Dictionary<int, GameObject> rows;
     private PlayerScore lastGame;
 
-    private string DatabasePath => Path.Combine(Application.streamingAssetsPath, databaseLocalPath);
+    private static string DatabasePath => Path.Combine(Application.streamingAssetsPath, databaseFileName);
 
     void Awake()
     {
-        // Initialize Database
-        if ( dbConnection == null )
-        {
-            dbConnection = new SqliteConnection($"Data Source={DatabasePath};Version=3;");
-            dbConnection.Open();
-            CreateTable();
-            playerScores = LoadScores();
-        }
-
         if ( GlobalVariables.Score != -1 )
         {
             lastGame = SaveScore();
@@ -45,7 +37,27 @@ public class Leaderboard : MonoBehaviour
         DisplayScores();
     }
 
-    private void CreateTable()
+    public static void Init(string dbFileName, string tableName)
+    {
+
+        if ( dbConnection == null )
+        {
+            Leaderboard.tableName = tableName;
+            Leaderboard.databaseFileName = dbFileName;
+
+            LoadDatabase();
+            CreateTable();
+            playerScores = LoadScores();
+        }
+    }
+
+    public static void LoadDatabase()
+    {
+        dbConnection = new SqliteConnection($"Data Source={DatabasePath};Version=3;");
+        dbConnection.Open();
+    }
+
+    private static void CreateTable()
     {
         string createTableQuery = @$"
                     CREATE TABLE IF NOT EXISTS {tableName} (
@@ -57,7 +69,7 @@ public class Leaderboard : MonoBehaviour
         command.ExecuteNonQuery();
     }
 
-    private List<PlayerScore> LoadScores()
+    private static List<PlayerScore> LoadScores()
     {
         var scores = new List<PlayerScore>();
         using ( var command = new SqliteCommand($"SELECT * FROM {tableName} ORDER BY Score DESC", dbConnection) )
