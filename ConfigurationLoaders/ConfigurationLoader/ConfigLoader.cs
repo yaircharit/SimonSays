@@ -6,11 +6,6 @@
     public abstract class ConfigLoader<T> where T : class
     {
         /// <summary>
-        /// Path to the configuration file.
-        /// </summary>
-        private readonly string configPath;
-
-        /// <summary>
         /// Dictionary to hold configuration data.
         /// </summary>
         public Dictionary<string, T> Data { get; protected set; }
@@ -32,26 +27,9 @@
         protected ConfigLoader(string configPath)
         {
             Data = new Dictionary<string, T>();
-            this.configPath = configPath;
 
-            ReadConfigurationFile();
-        }
-
-        /// <summary>
-        /// Reads the configuration file and parses its content.
-        /// </summary>
-        /// <exception cref="FileNotFoundException">Thrown when the configuration file could not be found.</exception>
-        /// <exception cref="IOException">Thrown when an I/O error occurs while opening the configuration file.</exception>
-        /// <exception cref="UnauthorizedAccessException">Thrown when the caller does not have the required permission to access the configuration file.</exception>
-        /// <exception cref="ArgumentException">Thrown when the path is invalid.</exception>
-        /// <exception cref="PathTooLongException">Thrown when the specified path, file name, or both exceed the system-defined maximum length.</exception>
-        /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
-        /// <exception cref="NotSupportedException">Thrown when the path is in an invalid format.</exception>
-        /// <exception cref="InvalidOperationException">Thrown when the data cannot be deserialized.</exception>
-        private void ReadConfigurationFile()
-        {
             // Read the raw data from the configuration file.
-            string rawData = File.ReadAllText(this.configPath);
+            string rawData = File.ReadAllText(configPath);
             // Parse the raw data.
             ParseRawData(rawData);
         }

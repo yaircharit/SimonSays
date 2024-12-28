@@ -1,67 +1,66 @@
 using Assets.Scripts;
-using System;
+using Mono.Data.Sqlite;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System.Data.SqlClient;
 
 public class Leaderboard : MonoBehaviour
 {
-    public string databaseLocalPath = "Resources/leaderboard.mdf";
+    public string databaseLocalPath = "leaderboard.db";
+    public string tableName = "Leaderboard";
     public GameObject rowPrefab;
     public TMP_Text titleTextObject;
     public GameObject rowsContainer;
     public Color hightlightColor = Color.yellow;
 
-    private static SqlConnection dbConnection;
+    private static SqliteConnection dbConnection;
     private static List<PlayerScore> playerScores;
     private Dictionary<int, GameObject> rows;
     private PlayerScore lastGame;
 
-    private string DatabasePath => Path.Combine(Application.dataPath, databaseLocalPath);
+    private string DatabasePath => Path.Combine(Application.streamingAssetsPath, databaseLocalPath);
 
     void Awake()
     {
         // Initialize Database
-        dbConnection ??= new SqlConnection($"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={DatabasePath};Integrated Security=True");
-        dbConnection.Open();
-        CreateIfNotExists();
-
-        playerScores ??= LoadScores();
+        if ( dbConnection == null )
+        {
+            dbConnection = new SqliteConnection($"Data Source={DatabasePath};Version=3;");
+            dbConnection.Open();
+            CreateTable();
+            playerScores = LoadScores();
+        }
 
         if ( GlobalVariables.Score != -1 )
         {
             lastGame = SaveScore();
-            GlobalVariables.Score = -1;
         }
 
         rows = new();
         DisplayScores();
     }
 
-    private void CreateIfNotExists()
+    private void CreateTable()
     {
-        // Create file if missing
-        if ( !File.Exists(DatabasePath) )
-        {
-            File.Create(DatabasePath);
-        }
-
-        // Create Table if missing
-        using ( var command = new SqlCommand("IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PlayerScores' AND xtype='U') CREATE TABLE PlayerScores (Id INT PRIMARY KEY, PlayerName NVARCHAR(100), Score INT)", dbConnection) )
-        {
-            command.ExecuteNonQuery();
-        }
+        string createTableQuery = @$"
+                    CREATE TABLE IF NOT EXISTS {tableName} (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        PlayerName TEXT NOT NULL,
+                        Score INTEGER NOT NULL
+                    )";
+        using var command = new SqliteCommand(createTableQuery, dbConnection);
+        command.ExecuteNonQuery();
     }
 
     private List<PlayerScore> LoadScores()
     {
         var scores = new List<PlayerScore>();
-        using ( var command = new SqlCommand("SELECT * FROM PlayerScores ORDER BY Score DESC", dbConnection) )
+        using ( var command = new SqliteCommand($"SELECT * FROM {tableName} ORDER BY Score DESC", dbConnection) )
         {
             using ( var reader = command.ExecuteReader() )
             {
@@ -92,25 +91,28 @@ public class Leaderboard : MonoBehaviour
 
             rank++;
 
-            rows.Add(score.Id, row);
+            rows[score.Id] = row;
         }
 
-        if ( GlobalVariables.Score != -1 ) // If the last game was won
+        if ( GlobalVariables.Score != -1 ) // If the last game is over (win/lose)
         {
             titleTextObject.text = GlobalVariables.GameWon ? "Congratulations!" : "You Lost!";
             HightlightRow(lastGame);
+            GlobalVariables.Score = -1;
         }
     }
 
     public PlayerScore SaveScore()
     {
-        return SaveScore(new PlayerScore() { Id = playerScores.Count, PlayerName = GlobalVariables.PlayerName, Score = GlobalVariables.Score });
+        return SaveScore(new PlayerScore() { PlayerName = GlobalVariables.PlayerName, Score = GlobalVariables.Score });
     }
 
-    public PlayerScore SaveScore(PlayerScore newScore)
+    private PlayerScore SaveScore(PlayerScore newScore)
     {
-        new SqlCommand($"INSERT INTO PlayerScores (Id, PlayerName, Score) VALUES ({newScore})", dbConnection).ExecuteNonQuery();
+        using var command = new SqliteCommand($"INSERT INTO {tableName} (PlayerName, Score) VALUES ({newScore})", dbConnection);
+        command.ExecuteNonQuery();
         playerScores.Add(newScore);
+        newScore.Id = playerScores.Count;
         playerScores = playerScores.OrderByDescending(score => score.Score).ToList();
         return newScore;
     }
@@ -137,7 +139,6 @@ public class Leaderboard : MonoBehaviour
 
         containerRectTransform.anchoredPosition = new Vector2(containerRectTransform.anchoredPosition.x, rowPosition.y - (rowHeight * 10));
     }
-
 }
 
 [System.Serializable]
@@ -149,6 +150,6 @@ public class PlayerScore
 
     public override string ToString()
     {
-        return $"{Id}, {PlayerName}, {Score}";
+        return $"'{PlayerName}', {Score}";
     }
 }
