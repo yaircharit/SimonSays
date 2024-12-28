@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Data.SqlClient;
 
 public class Leaderboard : MonoBehaviour
 {
@@ -17,7 +17,7 @@ public class Leaderboard : MonoBehaviour
     public GameObject rowsContainer;
     public Color hightlightColor = Color.yellow;
 
-    private static SQLiteConnection dbConnection;
+    private static SqlConnection dbConnection;
     private static List<PlayerScore> playerScores;
     private Dictionary<int, GameObject> rows;
     private PlayerScore lastGame;
@@ -27,9 +27,11 @@ public class Leaderboard : MonoBehaviour
     void Awake()
     {
         // Initialize Database
-        dbConnection ??= new SQLiteConnection(DatabasePath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
-        dbConnection.CreateTable<PlayerScore>();
-        playerScores ??= dbConnection.Table<PlayerScore>().OrderByDescending(score => score.Score).ToList();
+        dbConnection ??= new SqlConnection($"Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename={DatabasePath};Integrated Security=True");
+        dbConnection.Open();
+        CreateIfNotExists();
+
+        playerScores ??= LoadScores();
 
         if ( GlobalVariables.Score != -1 )
         {
@@ -39,6 +41,41 @@ public class Leaderboard : MonoBehaviour
 
         rows = new();
         DisplayScores();
+    }
+
+    private void CreateIfNotExists()
+    {
+        // Create file if missing
+        if ( !File.Exists(DatabasePath) )
+        {
+            File.Create(DatabasePath);
+        }
+
+        // Create Table if missing
+        using ( var command = new SqlCommand("IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PlayerScores' AND xtype='U') CREATE TABLE PlayerScores (Id INT PRIMARY KEY, PlayerName NVARCHAR(100), Score INT)", dbConnection) )
+        {
+            command.ExecuteNonQuery();
+        }
+    }
+
+    private List<PlayerScore> LoadScores()
+    {
+        var scores = new List<PlayerScore>();
+        using ( var command = new SqlCommand("SELECT * FROM PlayerScores ORDER BY Score DESC", dbConnection) )
+        {
+            using ( var reader = command.ExecuteReader() )
+            {
+                while ( reader.Read() )
+                {
+                    scores.Add(new PlayerScore {
+                        Id = reader.GetInt32(0),
+                        PlayerName = reader.GetString(1),
+                        Score = reader.GetInt32(2)
+                    });
+                }
+            }
+        }
+        return scores;
     }
 
     private void DisplayScores()
@@ -67,11 +104,12 @@ public class Leaderboard : MonoBehaviour
 
     public PlayerScore SaveScore()
     {
-        return SaveScore(new PlayerScore() { PlayerName = GlobalVariables.PlayerName, Score = GlobalVariables.Score });
+        return SaveScore(new PlayerScore() { Id = playerScores.Count, PlayerName = GlobalVariables.PlayerName, Score = GlobalVariables.Score });
     }
+
     public PlayerScore SaveScore(PlayerScore newScore)
     {
-        dbConnection.Insert(newScore);
+        new SqlCommand($"INSERT INTO PlayerScores (Id, PlayerName, Score) VALUES ({newScore})", dbConnection).ExecuteNonQuery();
         playerScores.Add(newScore);
         playerScores = playerScores.OrderByDescending(score => score.Score).ToList();
         return newScore;
@@ -99,13 +137,18 @@ public class Leaderboard : MonoBehaviour
 
         containerRectTransform.anchoredPosition = new Vector2(containerRectTransform.anchoredPosition.x, rowPosition.y - (rowHeight * 10));
     }
+
 }
 
 [System.Serializable]
 public class PlayerScore
 {
-    [PrimaryKey, AutoIncrement]
     public int Id { get; set; }
     public string PlayerName { get; set; }
     public int Score { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Id}, {PlayerName}, {Score}";
+    }
 }
