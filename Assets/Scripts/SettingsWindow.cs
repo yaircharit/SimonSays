@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+using Assets.Scripts;
 
 public class SettingsWindow : MonoBehaviour
 {
@@ -21,17 +23,16 @@ public class SettingsWindow : MonoBehaviour
 
     void Awake()
     {
-        gameObject.SetActive(false);
-
         // Initialize volume slider
-        volumeSlider.value = AudioListener.volume;
+        volumeSlider.value = GlobalVariables.Volume;
         volumeSlider.onValueChanged.AddListener(SetVolume);
 
         // Initialize mute button
-        muteToggle.onValueChanged.AddListener((state) => ToggleMute(state));
+        muteToggle.isOn = GlobalVariables.Mute;
+        muteToggle.onValueChanged.AddListener(ToggleMute);
 
         // Initialize resolution dropdown
-        resolutions = Screen.resolutions;
+        resolutions = Screen.resolutions; //TODO: only common resolutions
         resolutionDropdown.ClearOptions();
         var options = new List<string>();
         foreach ( var res in resolutions )
@@ -39,12 +40,12 @@ public class SettingsWindow : MonoBehaviour
             options.Add(res.width + " x " + res.height);
         }
         resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = GetCurrentResolutionIndex();
+        resolutionDropdown.value = GlobalVariables.Resolution;
         resolutionDropdown.RefreshShownValue();
         resolutionDropdown.onValueChanged.AddListener(SetResolution);
 
         // Initialize fullscreen toggle
-        fullscreenToggle.isOn = Screen.fullScreen;
+        fullscreenToggle.isOn = GlobalVariables.Fullscreen;
         fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
 
         // Initialize apply and cancel buttons
@@ -52,69 +53,66 @@ public class SettingsWindow : MonoBehaviour
         cancelButton.onClick.AddListener(CancelSettings);
 
         // Save initial settings
-        initialVolume = AudioListener.volume;
-        initialMuteState = isMuted;
-        initialResolutionIndex = resolutionDropdown.value;
-        initialFullscreenState = Screen.fullScreen;
+        initialVolume = GlobalVariables.Volume;
+        initialMuteState = GlobalVariables.Mute;
+        initialResolutionIndex = GlobalVariables.Resolution;
+        initialFullscreenState = GlobalVariables.Fullscreen;
     }
 
     private void SetVolume(float volume)
     {
-        AudioListener.volume = volume;
+        GlobalVariables.Volume = volume;
+        AudioListener.volume = volume / 100;
     }
 
     private void ToggleMute(bool state)
     {
-        isMuted = !isMuted;
+        isMuted = state;
+        GlobalVariables.Mute = state;
         AudioListener.volume = isMuted ? 0 : volumeSlider.value / 100;
-        muteToggle.GetComponentInChildren<Text>().text = isMuted ? "Unmute" : "Mute";
+        muteToggle.GetComponentInChildren<TMP_Text>().text = isMuted ? "Unmute" : "Mute";
+        volumeSlider.interactable = !isMuted;
     }
 
     private void SetResolution(int resolutionIndex)
     {
+        GlobalVariables.Resolution = resolutionIndex;
         Resolution resolution = resolutions[resolutionIndex];
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
     }
 
     private void SetFullscreen(bool isFullscreen)
     {
+        GlobalVariables.Fullscreen = isFullscreen;
         Screen.fullScreen = isFullscreen;
-    }
-
-    private int GetCurrentResolutionIndex()
-    {
-        for ( int i = 0; i < resolutions.Length; i++ )
-        {
-            if ( resolutions[i].width == Screen.currentResolution.width &&
-                resolutions[i].height == Screen.currentResolution.height )
-            {
-                return i;
-            }
-        }
-        return 0;
     }
 
     private void ApplySettings()
     {
-        initialVolume = AudioListener.volume;
-        initialMuteState = isMuted;
-        initialResolutionIndex = resolutionDropdown.value;
-        initialFullscreenState = Screen.fullScreen;
-
-        gameObject.SetActive(false);
+        initialVolume = GlobalVariables.Volume;
+        initialMuteState = GlobalVariables.Mute;
+        initialResolutionIndex = GlobalVariables.Resolution;
+        initialFullscreenState = GlobalVariables.Fullscreen;
+        PlayerPrefs.Save();
+        SceneManager.LoadScene("MainMenu");
     }
 
     private void CancelSettings()
     {
+        GlobalVariables.Volume = initialVolume;
+        GlobalVariables.Mute = initialMuteState;
+        GlobalVariables.Resolution = initialResolutionIndex;
+        GlobalVariables.Fullscreen = initialFullscreenState;
+
         AudioListener.volume = initialVolume;
         isMuted = initialMuteState;
         volumeSlider.value = initialVolume;
-        muteToggle.isOn = !initialMuteState;
+        muteToggle.isOn = initialMuteState;
         resolutionDropdown.value = initialResolutionIndex;
         resolutionDropdown.RefreshShownValue();
         Screen.SetResolution(resolutions[initialResolutionIndex].width, resolutions[initialResolutionIndex].height, initialFullscreenState);
         fullscreenToggle.isOn = initialFullscreenState;
 
-        gameObject.SetActive(false);
+        SceneManager.LoadScene("MainMenu");
     }
 }

@@ -1,6 +1,7 @@
 using Assets.Scripts;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class GameManager : MonoBehaviour
         sequence.Clear();
         sequenceIndex = 0;
         score = 0;
-        time = GlobalVariables.selectedConfig.GameTime;
+        time = GlobalVariables.SelectedConfig.GameTime;
         isRunning = true;
     }
 
@@ -54,8 +55,8 @@ public class GameManager : MonoBehaviour
     private void NextRound()
     {
         ViewManager.EnableButtons(false);
-        sequence.Add(rand.Next(GlobalVariables.selectedConfig.GameButtons));
-        StartCoroutine(ViewManager.Instance.PlaySequance());
+        sequence.Add(rand.Next(GlobalVariables.SelectedConfig.GameButtons));
+        ViewManager.Instance.HandleRepeatButtonClick();
     }
 
     /// <summary>
@@ -71,8 +72,8 @@ public class GameManager : MonoBehaviour
             if ( sequenceIndex == sequence.Count )
             {
                 // All sequence pressed correctly
-
-                score += GlobalVariables.selectedConfig.PointsEachStep;
+                
+                score += GlobalVariables.SelectedConfig.PointsEachStep;
                 ViewManager.Instance.UpdateScore(score);
                 sequenceIndex = 0;
 
@@ -87,7 +88,9 @@ public class GameManager : MonoBehaviour
 
     public void EndGame(bool gameWon)
     {
-        var playerScore = Leaderboard.Instance.SaveScore(score);
-        ViewManager.Instance.EndGame(gameWon,playerScore);
+        GlobalVariables.Score = score;
+        GlobalVariables.GameWon = gameWon;
+        SceneManager.LoadScene("Leaderboard");
     }
+   
 }

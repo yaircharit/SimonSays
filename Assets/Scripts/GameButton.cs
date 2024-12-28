@@ -8,7 +8,6 @@ public class GameButton : MonoBehaviour
 {
     private static int buttonCount = 0;
 
-    public float colorCoefficient = 0.75f;
     public Sprite buttonSprite;
     public Sprite pressedButtonSprite;
 
@@ -21,7 +20,7 @@ public class GameButton : MonoBehaviour
     public void Awake()
     {
         index = buttonCount++;
-        color = ViewManager.Instance.buttonColors[index] * colorCoefficient;
+        color = ViewManager.Instance.buttonColors[index];// * colorCoefficient;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.color = color;
@@ -46,13 +45,11 @@ public class GameButton : MonoBehaviour
 
     public IEnumerator ActivateButton()
     {
-        spriteRenderer.color = color * 2;
         spriteRenderer.sprite = pressedButtonSprite;
         audioSource.Play();
 
         yield return new WaitWhile(() => audioSource.isPlaying);
 
-        spriteRenderer.color = color;
         spriteRenderer.sprite = buttonSprite;
     }
 }

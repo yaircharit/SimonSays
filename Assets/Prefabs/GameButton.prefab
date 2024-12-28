@@ -99,8 +99,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d674789b355937641adaa05b2e897297, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonDelay: 1
-  colorCoefficient: 0.75
   buttonSprite: {fileID: 21300000, guid: 5c41c2dd1b1924bb684ece840006cff3, type: 3}
   pressedButtonSprite: {fileID: 21300000, guid: 6c6fa9aab7614440e9d0ecd4bd01598f, type: 3}
 --- !u!58 &2654357759922077475

@@ -11,57 +11,34 @@ using UnityEngine.UI;
 
 public class Leaderboard : MonoBehaviour
 {
-    public static Leaderboard Instance { get; private set; }
-
     public string databaseLocalPath = "Resources/leaderboard.mdf";
     public GameObject rowPrefab;
-    public TextMeshProUGUI titleTextObject;
+    public TMP_Text titleTextObject;
     public GameObject rowsContainer;
     public Color hightlightColor = Color.yellow;
 
     private static SQLiteConnection dbConnection;
     private static List<PlayerScore> playerScores;
-    private static Dictionary<int, GameObject> rows;
-
-    private static string WindowTitle
-    {
-        get { return Instance.titleTextObject.GetComponent<TextMeshProUGUI>().text; }
-        set { Instance.titleTextObject.GetComponent<TextMeshProUGUI>().text = value; }
-    }
+    private Dictionary<int, GameObject> rows;
+    private PlayerScore lastGame;
 
     private string DatabasePath => Path.Combine(Application.dataPath, databaseLocalPath);
 
     void Awake()
     {
-        gameObject.SetActive(false);
-        if ( Instance == null )
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject.transform.parent);
-
-            rows = new();
-            gameObject.GetComponentsInChildren<Button>()
-            .Single((child) => child.name == "ExitButton")
-            .onClick.AddListener(CloseWindow);
-
-            InitializeDatabase();
-            LoadScores();
-        } else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    private void InitializeDatabase()
-    {
-        dbConnection = new SQLiteConnection(DatabasePath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+        // Initialize Database
+        dbConnection ??= new SQLiteConnection(DatabasePath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
         dbConnection.CreateTable<PlayerScore>();
-    }
+        playerScores ??= dbConnection.Table<PlayerScore>().OrderByDescending(score => score.Score).ToList();
 
-    private void LoadScores()
-    {
-        playerScores = dbConnection.Table<PlayerScore>().OrderByDescending(score => score.Score).ToList();
-        Debug.Log(playerScores.Count);
+        if ( GlobalVariables.Score != -1 )
+        {
+            lastGame = SaveScore();
+            GlobalVariables.Score = -1;
+        }
+
+        rows = new();
+        DisplayScores();
     }
 
     private void DisplayScores()
@@ -78,14 +55,19 @@ public class Leaderboard : MonoBehaviour
 
             rank++;
 
-            Debug.Log(score);
             rows.Add(score.Id, row);
+        }
+
+        if ( GlobalVariables.Score != -1 ) // If the last game was won
+        {
+            titleTextObject.text = GlobalVariables.GameWon ? "Congratulations!" : "You Lost!";
+            HightlightRow(lastGame);
         }
     }
 
-    public PlayerScore SaveScore(int score = -1)
+    public PlayerScore SaveScore()
     {
-        return SaveScore(new PlayerScore() { PlayerName = GlobalVariables.PlayerName, Score = score });
+        return SaveScore(new PlayerScore() { PlayerName = GlobalVariables.PlayerName, Score = GlobalVariables.Score });
     }
     public PlayerScore SaveScore(PlayerScore newScore)
     {
@@ -97,31 +79,26 @@ public class Leaderboard : MonoBehaviour
 
     public void CloseWindow()
     {
-        gameObject.SetActive(false);
-        if ( SceneManager.GetActiveScene().name == "SimonSays" )
-        {
-            SceneManager.LoadScene("Homescreen");
-        }
-
-        // Remove all rows - should change by the next time the window is opened
-        Array.ForEach(rows.Values.ToArray(), row => Destroy(row));
-        rows.Clear();
+        SceneManager.LoadScene("MainMenu");
     }
 
-    public void OpenWindow(string title = "Leaderboard", int toHighlight = -1)
+    public void HightlightRow(PlayerScore playerScore)
     {
-        WindowTitle = title;
-        gameObject.SetActive(true);
-        DisplayScores();
-        if ( toHighlight >= 0 )
-            HightlightPlayerScore(toHighlight);
+        rows[playerScore.Id].GetComponent<Image>().color = hightlightColor;
+        ScrollTo(playerScore);
     }
 
-    public void HightlightPlayerScore(int playerScoreId)
+    public void ScrollTo(PlayerScore playerScore)
     {
-        rows[playerScoreId].GetComponent<Image>().color = hightlightColor;
-    }
+        Canvas.ForceUpdateCanvases();
+        RectTransform containerRectTransform = rowsContainer.GetComponent<RectTransform>();
+        RectTransform rowRectTransform = rows[playerScore.Id].GetComponent<RectTransform>();
 
+        Vector2 rowPosition = (Vector2)containerRectTransform.InverseTransformPoint(containerRectTransform.position) - (Vector2)containerRectTransform.InverseTransformPoint(rowRectTransform.position);
+        float rowHeight = rowRectTransform.rect.height;
+
+        containerRectTransform.anchoredPosition = new Vector2(containerRectTransform.anchoredPosition.x, rowPosition.y - (rowHeight * 10));
+    }
 }
 
 [System.Serializable]

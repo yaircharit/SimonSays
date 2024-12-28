@@ -12,12 +12,14 @@ public class ViewManager : MonoBehaviour
     public GameObject buttonPrefab;
     public float buttonsRadius = 2.7f;
     public AudioClip[] sounds;
-    public Color[] buttonColors = { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan }; // TODO: read from style config
+    public Color[] buttonColors = { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan };
     public float defaultGameDelay = 0.8f;
     public Button repeatButton;
+    public GameObject overlayWindowObject;
+    private OverlayWindow overlayWindow;
+
     public TextMeshProUGUI scoreTextObject;
     public TextMeshProUGUI timeTextObject;
-    public Button exitButton;
     public GameObject leaderboardWindow;
 
     private static GameButton[] buttons;
@@ -28,15 +30,12 @@ public class ViewManager : MonoBehaviour
     {
         Instance = this;
 
-        // Add listeners to buttons
-        exitButton.onClick.AddListener(() => UnityEngine.SceneManagement.SceneManager.LoadScene("Homescreen"));
-        repeatButton.onClick.AddListener(() => StartCoroutine(PlaySequance()));
-        
+        overlayWindow = overlayWindowObject.GetComponent<OverlayWindow>();
 
         // Apply selected config
-        repeatButton.gameObject.SetActive(GlobalVariables.selectedConfig.RepeatMode);
-        gameDelay = defaultGameDelay / GlobalVariables.selectedConfig.GameSpeed;
-        SpawnButtons(GlobalVariables.selectedConfig.GameButtons);
+        repeatButton.gameObject.SetActive(GlobalVariables.SelectedConfig.RepeatMode);
+        gameDelay = defaultGameDelay / GlobalVariables.SelectedConfig.GameSpeed;
+        SpawnButtons(GlobalVariables.SelectedConfig.GameButtons);
     }
 
     /// <summary>
@@ -83,6 +82,19 @@ public class ViewManager : MonoBehaviour
         Array.ForEach(buttons, (butt) => butt.enabled = enable);
     }
 
+    public void HandleRepeatButtonClick()
+    {
+        StartCoroutine(PlaySequance());
+    }
+
+    private void Update()
+    {
+        if ( Input.GetKeyDown(KeyCode.Escape) )
+        {
+            overlayWindow.OpenWindow();
+        }
+    }
+
     /// <summary>
     /// Plays the sequence of buttons. Disables buttons while playing
     /// </summary>
@@ -99,10 +111,5 @@ public class ViewManager : MonoBehaviour
         }
 
         EnableButtons(true);
-    }
-
-    public void EndGame(bool gameWon, PlayerScore currentPlayerScore)
-    {
-        Leaderboard.Instance.OpenWindow($"You {(gameWon ? "Won" : "Lost")}!", currentPlayerScore.Id);
     }
 }
