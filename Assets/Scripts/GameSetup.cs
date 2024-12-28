@@ -18,7 +18,7 @@ public class GameSetup : MonoBehaviour
 
     void Awake()
     {
-        GlobalVariables.Configs ??= ConfigLoader<AppConfig>.LoadConfig(Path.Combine(Application.dataPath, "Resources/config.json")); // ONLY FOR TESTING
+        GlobalVariables.Configs ??= ConfigLoader<AppConfig>.LoadConfig(Path.Combine(Application.streamingAssetsPath, "config.json")); // ONLY FOR TESTING
         overlayWindow = overlayWindowObject.GetComponent<PlayerNameOverlayWindow>();
 
         // Initialize buttons for each config

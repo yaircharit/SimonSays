@@ -8,8 +8,8 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    public string configLocalPath = "Resources/config.json";
-    private string configPath => Path.Combine(Application.dataPath, configLocalPath);
+    public string configLocalPath = "config.json";
+    private string configPath => Path.Combine(Application.streamingAssetsPath, configLocalPath);
 
     private void Awake()
     {
