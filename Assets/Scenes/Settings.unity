@@ -1322,8 +1322,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 162.48, y: -78.6495}
-  m_SizeDelta: {x: 224.95999, y: 0}
+  m_AnchoredPosition: {x: 197.5, y: -78.6495}
+  m_SizeDelta: {x: 295, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &623290836
 MonoBehaviour:
@@ -2344,7 +2344,9 @@ MonoBehaviour:
   m_ItemImage: {fileID: 0}
   m_Value: 0
   m_Options:
-    m_Options: []
+    m_Options:
+    - m_Text: 
+      m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -3065,11 +3067,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f86ebcffd2d7d63438ec6eddc90f7f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeSlider: {fileID: 0}
-  muteToggle: {fileID: 0}
-  resolutionDropdown: {fileID: 0}
-  fullscreenToggle: {fileID: 0}
-  supportedResolutions: []
+  volumeSlider: {fileID: 1666011406}
+  muteToggle: {fileID: 623290838}
+  resolutionDropdown: {fileID: 1314241576}
+  fullscreenToggle: {fileID: 1153359031}
 --- !u!1 &1666011404
 GameObject:
   m_ObjectHideFlags: 0
@@ -3208,7 +3209,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 79.96, y: 37.299}
+  m_SizeDelta: {x: 150, y: 37.299}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1733355221
 MonoBehaviour:

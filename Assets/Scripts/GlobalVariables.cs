@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ConfigurationLoader;
+using Mono.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -6,15 +8,27 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts
 {
-    public static class GlobalVariables
+    public class GlobalVariables : ScriptableObject
     {
-        public static Dictionary<string, AppConfig> Configs { get; set; }
+        public static GlobalVariables Instance = CreateInstance<GlobalVariables>();
+
+        public Vector2Int defaultResolution = new Vector2Int(1280, 720);
+        public string configName = "config.json";
+        
+
+        public static Resolution DefaultResolution => new Resolution() { width = Instance.defaultResolution.x, height = Instance.defaultResolution.y };
+        public static string ConfigPath => Path.Combine(Application.streamingAssetsPath, Instance.configName);
+        
+        public static Dictionary<string, AppConfig> Configs;
+
         public static AppConfig SelectedConfig { get; set; }
         public static bool GameWon { get; set; }
 
+
         private const string VolumeKey = "Volume";
         private const string MuteKey = "Mute";
-        private const string ResolutionKey = "Resolution";
+        private const string ResolutionXKey = "ResolutionX";
+        private const string ResolutionYKey = "ResolutionY";
         private const string FullscreenKey = "Fullscreen";
         private const string PlayerNameKey = "PlayerName";
         private const string ScoreKey = "Score";
@@ -27,13 +41,13 @@ namespace Assets.Scripts
 
         public static int Score
         {
-            get => PlayerPrefs.GetInt(ScoreKey, -1);    // Last game's score, -1 if no game was played
+            get => PlayerPrefs.GetInt(ScoreKey, -1);    // Last game's score, -1 after exiting back to main menu
             set { PlayerPrefs.SetInt(ScoreKey, value); }
         }
 
         public static float Volume
         {
-            get => PlayerPrefs.GetFloat(VolumeKey, 1.0f); // Default volume is 1.0 (100%)
+            get => PlayerPrefs.GetFloat(VolumeKey, 0.5f); // Default volume is 1.0 (100%)
             set { PlayerPrefs.SetFloat(VolumeKey, value); }
         }
 
@@ -43,10 +57,13 @@ namespace Assets.Scripts
             set { PlayerPrefs.SetInt(MuteKey, value ? 1 : 0); }
         }
 
-        public static int Resolution
+        public static Resolution Resolution
         {
-            get => PlayerPrefs.GetInt(ResolutionKey, 0); // Default resolution index is 0
-            set { PlayerPrefs.SetInt(ResolutionKey, value); }
+            get => new() { width = PlayerPrefs.GetInt(ResolutionXKey, DefaultResolution.width), height = PlayerPrefs.GetInt(ResolutionYKey, DefaultResolution.height) };
+            set {
+                PlayerPrefs.SetInt(ResolutionXKey, value.width);
+                PlayerPrefs.SetInt(ResolutionYKey, value.height);
+            }
         }
 
         public static bool Fullscreen
@@ -54,16 +71,5 @@ namespace Assets.Scripts
             get => PlayerPrefs.GetInt(FullscreenKey, 1) == 1; // Default is fullscreen
             set { PlayerPrefs.SetInt(FullscreenKey, value ? 1 : 0); }
         }
-    }
-
-    [Serializable]
-    public class AppConfig
-    {
-        public int GameButtons { get; set; }
-        public int PointsEachStep { get; set; }
-        public int GameTime { get; set; }
-        public bool RepeatMode { get; set; }
-        public float GameSpeed { get; set; }
-
     }
 }

@@ -8,13 +8,17 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    public string configLocalPath = "config.json";
-    private string configPath => Path.Combine(Application.streamingAssetsPath, configLocalPath);
+    public string databaseFileName = "leaderboard.db";
+    public string tableName = "Leaderboard";
+
 
     private void Awake()
     {
-        // Load config if not already loaded
-        GlobalVariables.Configs ??= ConfigLoader<AppConfig>.LoadConfig(configPath); // do it here so there won't be any delays when moving to GameSetup
+        // Load config and database if not already loaded
+        // do it here so there won't be any delays when moving to GameSetup
+        GlobalVariables.Configs ??= ConfigLoader<AppConfig>.LoadConfig(GlobalVariables.ConfigPath); 
+        Leaderboard.Init(databaseFileName,tableName);
+        SettingsWindow.LoadSettings();
     }
 
     public void OnPlayButtonClick()
