@@ -11,11 +11,18 @@ public class SettingsWindow : MonoBehaviour
     public Toggle muteToggle;
     public TMP_Dropdown resolutionDropdown;
     public Toggle fullscreenToggle;
-    public Button applyButton;
-    public Button cancelButton;
 
+    public string[] supportedResolutions;
     private bool isMuted = false;
-    private Resolution[] resolutions;
+    public Resolution[] resolutions = {
+        new Resolution { width = 1920, height = 1080 },
+        new Resolution { width = 1600, height = 900 },
+        new Resolution { width = 1366, height = 768 },
+        new Resolution { width = 1280, height = 720 },
+        new Resolution { width = 1024, height = 576 },
+        new Resolution { width = 800, height = 600 },
+        new Resolution { width = 640, height = 480 }
+    };
     private float initialVolume;
     private bool initialMuteState;
     private int initialResolutionIndex;
@@ -23,16 +30,7 @@ public class SettingsWindow : MonoBehaviour
 
     void Awake()
     {
-        // Initialize volume slider
-        volumeSlider.value = GlobalVariables.Volume;
-        volumeSlider.onValueChanged.AddListener(SetVolume);
-
-        // Initialize mute button
-        muteToggle.isOn = GlobalVariables.Mute;
-        muteToggle.onValueChanged.AddListener(ToggleMute);
-
         // Initialize resolution dropdown
-        resolutions = Screen.resolutions; //TODO: only common resolutions
         resolutionDropdown.ClearOptions();
         var options = new List<string>();
         foreach ( var res in resolutions )
@@ -40,54 +38,50 @@ public class SettingsWindow : MonoBehaviour
             options.Add(res.width + " x " + res.height);
         }
         resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = GlobalVariables.Resolution;
         resolutionDropdown.RefreshShownValue();
-        resolutionDropdown.onValueChanged.AddListener(SetResolution);
 
-        // Initialize fullscreen toggle
+        // Initialize based on previous settings
+        volumeSlider.value = GlobalVariables.Volume;
+        muteToggle.isOn = GlobalVariables.Mute;
         fullscreenToggle.isOn = GlobalVariables.Fullscreen;
-        fullscreenToggle.onValueChanged.AddListener(SetFullscreen);
+        resolutionDropdown.value = GlobalVariables.Resolution;
 
-        // Initialize apply and cancel buttons
-        applyButton.onClick.AddListener(ApplySettings);
-        cancelButton.onClick.AddListener(CancelSettings);
-
-        // Save initial settings
+        // Save initial settings to revert back if needed
         initialVolume = GlobalVariables.Volume;
         initialMuteState = GlobalVariables.Mute;
         initialResolutionIndex = GlobalVariables.Resolution;
         initialFullscreenState = GlobalVariables.Fullscreen;
     }
 
-    private void SetVolume(float volume)
+    public void SetVolume()
     {
-        GlobalVariables.Volume = volume;
-        AudioListener.volume = volume / 100;
+        GlobalVariables.Volume = volumeSlider.value;
+        AudioListener.volume = volumeSlider.value / 100;
     }
 
-    private void ToggleMute(bool state)
+    public void ToggleMute()
     {
-        isMuted = state;
-        GlobalVariables.Mute = state;
+        isMuted = muteToggle.isOn;
+        GlobalVariables.Mute = muteToggle.isOn;
         AudioListener.volume = isMuted ? 0 : volumeSlider.value / 100;
         muteToggle.GetComponentInChildren<TMP_Text>().text = isMuted ? "Unmute" : "Mute";
         volumeSlider.interactable = !isMuted;
     }
 
-    private void SetResolution(int resolutionIndex)
+    public void SetResolution()
     {
-        GlobalVariables.Resolution = resolutionIndex;
-        Resolution resolution = resolutions[resolutionIndex];
+        GlobalVariables.Resolution = resolutionDropdown.value;
+        Resolution resolution = resolutions[resolutionDropdown.value];
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
     }
 
-    private void SetFullscreen(bool isFullscreen)
+    public void ToggleFullscreen()
     {
-        GlobalVariables.Fullscreen = isFullscreen;
-        Screen.fullScreen = isFullscreen;
+        GlobalVariables.Fullscreen = fullscreenToggle.isOn;
+        Screen.fullScreen = fullscreenToggle.isOn;
     }
 
-    private void ApplySettings()
+    public void ApplySettings()
     {
         initialVolume = GlobalVariables.Volume;
         initialMuteState = GlobalVariables.Mute;
@@ -97,7 +91,7 @@ public class SettingsWindow : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
-    private void CancelSettings()
+    public void CancelSettings()
     {
         GlobalVariables.Volume = initialVolume;
         GlobalVariables.Mute = initialMuteState;
