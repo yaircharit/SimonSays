@@ -19,18 +19,22 @@ public class GameButton : MonoBehaviour
 
     public void Awake()
     {
+        // Keeps track on its own how many buttons are there and assigns color relatively
         index = buttonCount++;
-        color = ViewManager.Instance.buttonColors[index];// * colorCoefficient;
+        color = ViewManager.Instance.buttonColors[index];
 
+        // Set color
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.color = color;
 
+        // Set audioclip
         audioSource = GetComponent<AudioSource>();
         audioSource.clip = GetComponentInParent<ViewManager>().sounds[index];
     }
 
     private void OnDestroy()
     {
+        // Keep track how many buttons are there
         buttonCount--;
     }
 
@@ -39,15 +43,19 @@ public class GameButton : MonoBehaviour
         if ( enabled )
         {
             StartCoroutine(ActivateButton());
-            GameManager.Instance.CheckSequence(index);
+            GameManager.Instance.CheckSequence(index); // Check if its the right button to press
         }
     }
 
+    /// <summary>
+    /// Plays the button's
+    /// </summary>
+    /// <returns>Finishes after the audioclip is done playing</returns>
     public IEnumerator ActivateButton()
     {
         spriteRenderer.sprite = pressedButtonSprite;
+        
         audioSource.Play();
-
         yield return new WaitWhile(() => audioSource.isPlaying);
 
         spriteRenderer.sprite = buttonSprite;

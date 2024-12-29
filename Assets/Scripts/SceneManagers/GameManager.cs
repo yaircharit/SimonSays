@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
         time = GlobalVariables.SelectedConfig.GameTime;
         if ( GlobalVariables.ChallengeMode )
         {
-            Time.timeScale = GlobalVariables.SelectedConfig.GameSpeed;
+            Time.timeScale = GlobalVariables.SelectedConfig.GameSpeed; // Set game speed if challenge mode was selected
         }
 
         isRunning = true;
@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour
                 ViewManager.Instance.UpdateTime((int)time);
             } else
             {
+                // Game won!
                 EndGame(true);
             }
         }
@@ -59,8 +60,8 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void NextRound()
     {
-        ViewManager.EnableButtons(false);
-        sequence.Add(rand.Next(GlobalVariables.SelectedConfig.GameButtons));
+        ViewManager.EnableButtons(false);   // Disable buttons so user can't change the sequence while playing
+        sequence.Add(rand.Next(GlobalVariables.SelectedConfig.GameButtons));    // Get the next buttons of the sequencec
         StartCoroutine(ViewManager.Instance.PlaySequance());
     }
 
@@ -91,6 +92,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Ends the game and moves to Leaderboard scene
+    /// </summary>
+    /// <param name="gameWon">true if the game was won; false if lost</param>
     public void EndGame(bool gameWon)
     {
         GlobalVariables.Score = score * (GlobalVariables.ChallengeMode? GlobalVariables.SelectedConfig.GameSpeed : 1); // TODO: Add animation

@@ -23,13 +23,12 @@ namespace Assets.Scripts
 
 
         public static string configFileName = "config.json";
-
         public static string ConfigPath => Path.Combine(Application.streamingAssetsPath, configFileName);
         public static Dictionary<string, AppConfig> Configs;
         public static AppConfig SelectedConfig { get; set; }
         public static int SelectedConfigIndex => Configs.Values.ToList().IndexOf(SelectedConfig);
+        
         public static bool GameWon { get; set; }
-
         public static string PlayerName
         {
             get => PlayerPrefs.GetString(PlayerNameKey, ""); // Keep the player's name in the PlayerPrefs, empty string if not set

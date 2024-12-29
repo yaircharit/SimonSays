@@ -58,6 +58,7 @@ public class ChallengeModeToggle : MonoBehaviour
     {
         if ( gameSpeeds == null )
         {
+            // Save all possible game speeds
             gameSpeeds = GlobalVariables.Configs.Values.Select(config => config.GameSpeed).ToArray();
         }
         toggle = gameObject.GetComponent<Toggle>();
@@ -66,6 +67,10 @@ public class ChallengeModeToggle : MonoBehaviour
         checkmarkImage = gameObject.transform.Find("Background").GetChild(0).GetComponent<Image>();
     }
 
+    /// <summary>
+    /// Sets the toggle object state
+    /// </summary>
+    /// <param name="active">new state</param>
     public void SetActive(bool active)
     {
         gameObject.SetActive(active);
@@ -75,7 +80,7 @@ public class ChallengeModeToggle : MonoBehaviour
     /// Sets the difficulty and adjusts the color and text accordingly (no text and no interactablity, for x1)
     /// </summary>
     /// <param name="difficulty"></param>
-    /// <returns></returns>
+    /// <returns>if the button is interactable</returns>
     public bool SetDifficulty(int difficulty)
     {
         this.difficulty = difficulty;
@@ -83,10 +88,10 @@ public class ChallengeModeToggle : MonoBehaviour
         if ( gameSpeeds[difficulty] == 1 )
         {
             Text = ""; // Don't print text if it's x1...
-            toggle.isOn = toggle.interactable = false;
+            toggle.isOn = toggle.interactable = false; //disable
         } else
         {
-            Text = $"x{gameSpeeds[difficulty]}";
+            Text = $"x{gameSpeeds[difficulty]}"; // x1.5
             toggle.interactable = true;
             checkmarkColor = difficultyColors[difficulty % 2 + 1]; // For silver trophy (Medium) set star to gold, For gold set it to silver
         }

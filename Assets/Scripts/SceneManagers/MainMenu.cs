@@ -25,7 +25,6 @@ public class MainMenu : MonoBehaviour
 
     public void OnSettingsButtonClick()
     {
-        //TODO: use overlay window?
         SceneManager.LoadScene("Settings");
     }
 

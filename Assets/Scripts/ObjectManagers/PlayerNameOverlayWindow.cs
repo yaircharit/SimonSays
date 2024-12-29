@@ -24,7 +24,7 @@ public class PlayerNameOverlayWindow : OverlayWindow
         base.OpenWindow();
         textInputField.text = GlobalVariables.PlayerName;
 
-        toggle.IsOn = GlobalVariables.ChallengeMode;
+        toggle.IsOn = GlobalVariables.ChallengeMode;    // Restore state from previous game
         toggle.Difficulty = GlobalVariables.SelectedConfigIndex; // Set the difficulty, text, and color
     }
 
@@ -32,6 +32,7 @@ public class PlayerNameOverlayWindow : OverlayWindow
     {
         string playerName = textInputField.text.Trim();
 
+        // Verify the player input
         if ( playerName == "" )
         {
             textInputField.GetComponent<Image>().color = noInputColor;
@@ -39,7 +40,7 @@ public class PlayerNameOverlayWindow : OverlayWindow
             return;
         }
 
-        GlobalVariables.ChallengeMode = toggle.IsOn && GlobalVariables.SelectedConfig.GameSpeed != 1;
+        GlobalVariables.ChallengeMode = toggle.IsOn && GlobalVariables.SelectedConfig.GameSpeed != 1; // not possible when game speed is 1
         GlobalVariables.PlayerName = playerName;
         SceneManager.LoadScene("GameScene");
     }
