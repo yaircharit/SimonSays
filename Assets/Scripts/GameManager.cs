@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
     {
         ViewManager.EnableButtons(false);
         sequence.Add(rand.Next(GlobalVariables.SelectedConfig.GameButtons));
-        ViewManager.Instance.HandleRepeatButtonClick();
+        StartCoroutine(ViewManager.Instance.PlaySequance());
     }
 
     /// <summary>

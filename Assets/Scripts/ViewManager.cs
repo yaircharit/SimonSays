@@ -85,11 +85,19 @@ public class ViewManager : MonoBehaviour
         StartCoroutine(PlaySequance());
     }
 
+    public void HandleExitButtonClick()
+    {
+        overlayWindow.OpenWindow();
+    }
+
     private void Update()
     {
         if ( Input.GetKeyDown(KeyCode.Escape) )
         {
-            overlayWindow.OpenWindow();
+            HandleExitButtonClick();
+        } else if ( Input.GetKeyDown(KeyCode.Space) )
+        {
+            HandleRepeatButtonClick();
         }
     }
 

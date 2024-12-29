@@ -14,17 +14,18 @@ public class PlayerNameOverlayWindow : OverlayWindow
     public GameObject challengeModeToggleGameObject;
     private ChallengeModeToggle toggle;
 
+    private void Awake()
+    {
+        toggle = challengeModeToggleGameObject.GetComponent<ChallengeModeToggle>();
+    }
 
     public override void OpenWindow()
     {
         base.OpenWindow();
         textInputField.text = GlobalVariables.PlayerName;
-        
-        toggle = challengeModeToggleGameObject.GetComponent<ChallengeModeToggle>();
 
-        toggle.SetActive(GlobalVariables.SelectedConfig.GameSpeed != 1); // Show only if there's a difference
         toggle.IsOn = GlobalVariables.ChallengeMode;
-        toggle.Difficulty = GlobalVariables.SelectedConfigIndex;
+        toggle.Difficulty = GlobalVariables.SelectedConfigIndex; // Set the difficulty, text, and color
     }
 
     public override void OnSubmit()

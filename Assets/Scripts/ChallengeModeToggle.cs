@@ -1,8 +1,10 @@
 using Assets.Scripts;
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Policy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +29,7 @@ public class ChallengeModeToggle : MonoBehaviour
     private TMP_Text label;
     public string Text
     {
-        get { return label.text;  }
+        get { return label.text; }
         set { label.text = value; }
     }
 
@@ -38,25 +40,30 @@ public class ChallengeModeToggle : MonoBehaviour
         set { image.color = value; }
     }
 
+    private Image checkmarkImage;
+    public Color checkmarkColor
+    {
+        get { return checkmarkImage.color; }
+        set { checkmarkImage.color = value; }
+    }
+
     private int difficulty;
     public int Difficulty
     {
         get { return difficulty; }
-        set {
-            difficulty = value;
-            Color = difficultyColors[value];
-            Text = $"x{gameSpeeds[value]}";
-        }
+        set { SetDifficulty(value); }
     }
 
     private void Awake()
     {
-        if (gameSpeeds == null){
-            gameSpeeds ??= GlobalVariables.Configs.Values.Select(config => config.GameSpeed).ToArray();
+        if ( gameSpeeds == null )
+        {
+            gameSpeeds = GlobalVariables.Configs.Values.Select(config => config.GameSpeed).ToArray();
         }
         toggle = gameObject.GetComponent<Toggle>();
         label = gameObject.GetComponentInChildren<TMP_Text>();
         image = gameObject.GetComponentInChildren<Image>();
+        checkmarkImage = gameObject.transform.Find("Background").GetChild(0).GetComponent<Image>();
     }
 
     public void SetActive(bool active)
@@ -64,5 +71,26 @@ public class ChallengeModeToggle : MonoBehaviour
         gameObject.SetActive(active);
     }
 
-    
+    /// <summary>
+    /// Sets the difficulty and adjusts the color and text accordingly (no text and no interactablity, for x1)
+    /// </summary>
+    /// <param name="difficulty"></param>
+    /// <returns></returns>
+    public bool SetDifficulty(int difficulty)
+    {
+        this.difficulty = difficulty;
+        Color = difficultyColors[difficulty];
+        if ( gameSpeeds[difficulty] == 1 )
+        {
+            Text = ""; // Don't print text if it's x1...
+            toggle.isOn = toggle.interactable = false;
+        } else
+        {
+            Text = $"x{gameSpeeds[difficulty]}";
+            toggle.interactable = true;
+            checkmarkColor = difficultyColors[difficulty % 2 + 1]; // For silver trophy (Medium) set star to gold, For gold set it to silver
+        }
+
+        return toggle.interactable;
+    }
 }
