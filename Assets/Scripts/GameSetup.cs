@@ -18,7 +18,7 @@ public class GameSetup : MonoBehaviour
 
     void Awake()
     {
-        GlobalVariables.Configs ??= ConfigLoader<AppConfig>.LoadConfig(Path.Combine(Application.streamingAssetsPath, "config.json")); // ONLY FOR TESTING
+        GlobalVariables.Init(); // ONLY FOR TESTING
         overlayWindow = overlayWindowObject.GetComponent<PlayerNameOverlayWindow>();
 
         // Initialize buttons for each config
@@ -36,5 +36,10 @@ public class GameSetup : MonoBehaviour
 
         // Open player name input overlay window
         overlayWindow.OpenWindow();
+    }
+
+    public void OnBackClick()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

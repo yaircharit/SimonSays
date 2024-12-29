@@ -23,7 +23,6 @@ public class ViewManager : MonoBehaviour
     public GameObject leaderboardWindow;
 
     private static GameButton[] buttons;
-    private static float gameDelay;
 
 
     private void Awake()
@@ -34,7 +33,6 @@ public class ViewManager : MonoBehaviour
 
         // Apply selected config
         repeatButton.gameObject.SetActive(GlobalVariables.SelectedConfig.RepeatMode);
-        gameDelay = defaultGameDelay / GlobalVariables.SelectedConfig.GameSpeed;
         SpawnButtons(GlobalVariables.SelectedConfig.GameButtons);
     }
 
@@ -101,13 +99,13 @@ public class ViewManager : MonoBehaviour
     public IEnumerator PlaySequance()
     {
         EnableButtons(false);
-        yield return new WaitForSeconds(gameDelay * 1.5f);
+        yield return new WaitForSeconds(defaultGameDelay * 1.5f); // Little pause before next round
 
         // play sequance
         foreach ( var butt in GameManager.sequence )
         {
             StartCoroutine(buttons[butt].ActivateButton());
-            yield return new WaitForSeconds(gameDelay);
+            yield return new WaitForSeconds(defaultGameDelay);
         }
 
         EnableButtons(true);

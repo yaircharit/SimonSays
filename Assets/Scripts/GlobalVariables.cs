@@ -3,28 +3,15 @@ using Mono.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets.Scripts
 {
-    public class GlobalVariables : ScriptableObject
+    public class GlobalVariables
     {
-        public static GlobalVariables Instance = CreateInstance<GlobalVariables>();
-
-        public Vector2Int defaultResolution = new Vector2Int(1280, 720);
-        public string configName = "config.json";
-        
-
-        public static Resolution DefaultResolution => new Resolution() { width = Instance.defaultResolution.x, height = Instance.defaultResolution.y };
-        public static string ConfigPath => Path.Combine(Application.streamingAssetsPath, Instance.configName);
-        
-        public static Dictionary<string, AppConfig> Configs;
-
-        public static AppConfig SelectedConfig { get; set; }
-        public static bool GameWon { get; set; }
-
-
+        // PlayerPrefs keys
         private const string VolumeKey = "Volume";
         private const string MuteKey = "Mute";
         private const string ResolutionXKey = "ResolutionX";
@@ -32,6 +19,16 @@ namespace Assets.Scripts
         private const string FullscreenKey = "Fullscreen";
         private const string PlayerNameKey = "PlayerName";
         private const string ScoreKey = "Score";
+        private const string ChallengeModeKey = "ChallengeModeKey";
+
+
+        public static string configFileName = "config.json";
+
+        public static string ConfigPath => Path.Combine(Application.streamingAssetsPath, configFileName);
+        public static Dictionary<string, AppConfig> Configs;
+        public static AppConfig SelectedConfig { get; set; }
+        public static int SelectedConfigIndex => Configs.Values.ToList().IndexOf(SelectedConfig);
+        public static bool GameWon { get; set; }
 
         public static string PlayerName
         {
@@ -39,10 +36,16 @@ namespace Assets.Scripts
             set { PlayerPrefs.SetString(PlayerNameKey, value); }
         }
 
-        public static int Score
+        public static float Score
         {
-            get => PlayerPrefs.GetInt(ScoreKey, -1);    // Last game's score, -1 after exiting back to main menu
-            set { PlayerPrefs.SetInt(ScoreKey, value); }
+            get => PlayerPrefs.GetFloat(ScoreKey, -1);    // Last game's score, -1 after exiting back to main menu
+            set { PlayerPrefs.SetFloat(ScoreKey, value); }
+        }
+
+        public static bool ChallengeMode
+        {
+            get => PlayerPrefs.GetInt(ChallengeModeKey, 0) == 1;    // If last game was in Challenge Mode or not
+            set { PlayerPrefs.SetInt(ChallengeModeKey, value ? 1 : 0); }
         }
 
         public static float Volume
@@ -57,6 +60,8 @@ namespace Assets.Scripts
             set { PlayerPrefs.SetInt(MuteKey, value ? 1 : 0); }
         }
 
+        public static Vector2Int defaultResolution = new Vector2Int(1280, 720);
+        public static Resolution DefaultResolution => new Resolution() { width = defaultResolution.x, height = defaultResolution.y };
         public static Resolution Resolution
         {
             get => new() { width = PlayerPrefs.GetInt(ResolutionXKey, DefaultResolution.width), height = PlayerPrefs.GetInt(ResolutionYKey, DefaultResolution.height) };
@@ -70,6 +75,21 @@ namespace Assets.Scripts
         {
             get => PlayerPrefs.GetInt(FullscreenKey, 1) == 1; // Default is fullscreen
             set { PlayerPrefs.SetInt(FullscreenKey, value ? 1 : 0); }
+        }
+
+        /// <summary>
+        /// Load config and database if not already loaded
+        /// </summary>
+        public static void Init(string configFileName= "config.json", string dbFileName = "leaderboard.db", string tableName = "Leaderboard")
+        {
+            if ( Configs == null )
+            {
+                GlobalVariables.configFileName = configFileName;
+                Configs = ConfigLoader<AppConfig>.LoadConfig(ConfigPath);
+
+                Leaderboard.Init(dbFileName, tableName);
+                SettingsWindow.LoadSettings();
+            }
         }
     }
 }

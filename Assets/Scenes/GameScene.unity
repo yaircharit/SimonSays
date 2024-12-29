@@ -184,7 +184,7 @@ MonoBehaviour:
   - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - {r: 1, g: 0, b: 1, a: 1}
   - {r: 0, g: 1, b: 1, a: 1}
-  defaultGameDelay: 0.8
+  defaultGameDelay: 0.7
   repeatButton: {fileID: 1666537090}
   overlayWindowObject: {fileID: 827864394}
   scoreTextObject: {fileID: 1398260479}
@@ -491,6 +491,10 @@ PrefabInstance:
     - target: {fileID: 4337900206138451643, guid: bca3cf0cf5923354a94252f7f41a3bfd, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -30
+      objectReference: {fileID: 0}
+    - target: {fileID: 7265128489056124604, guid: bca3cf0cf5923354a94252f7f41a3bfd, type: 3}
+      propertyPath: m_BlockingObjects
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7324616866677436594, guid: bca3cf0cf5923354a94252f7f41a3bfd, type: 3}
       propertyPath: m_AnchorMax.y

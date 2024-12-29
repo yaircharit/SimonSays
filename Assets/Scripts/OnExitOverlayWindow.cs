@@ -8,7 +8,7 @@ public class OnExitOverlayWindow : OverlayWindow
 {
     public override void OnSubmit()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("GameSetup");
     }
 
 }

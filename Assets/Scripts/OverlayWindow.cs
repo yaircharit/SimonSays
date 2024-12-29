@@ -10,11 +10,11 @@ namespace Assets.Scripts
     public abstract class OverlayWindow : MonoBehaviour
     {
 
-        public void OpenWindow()
+        public virtual void OpenWindow()
         {
             gameObject.SetActive(true);
         }
-        public void CloseWindow()
+        public virtual void CloseWindow()
         {
             gameObject.SetActive(false);
         }

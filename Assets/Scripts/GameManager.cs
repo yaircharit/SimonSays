@@ -24,6 +24,11 @@ public class GameManager : MonoBehaviour
         sequenceIndex = 0;
         score = 0;
         time = GlobalVariables.SelectedConfig.GameTime;
+        if ( GlobalVariables.ChallengeMode )
+        {
+            Time.timeScale = GlobalVariables.SelectedConfig.GameSpeed;
+        }
+
         isRunning = true;
     }
 
@@ -88,8 +93,9 @@ public class GameManager : MonoBehaviour
 
     public void EndGame(bool gameWon)
     {
-        GlobalVariables.Score = score;
+        GlobalVariables.Score = score * (GlobalVariables.ChallengeMode? GlobalVariables.SelectedConfig.GameSpeed : 1); // TODO: Add animation
         GlobalVariables.GameWon = gameWon;
+        Time.timeScale = 1; // back to normal
         SceneManager.LoadScene("Leaderboard");
     }
    

@@ -28,6 +28,8 @@ public class Leaderboard : MonoBehaviour
 
     void Awake()
     {
+        GlobalVariables.Init();
+
         if ( GlobalVariables.Score != -1 )
         {
             lastGame = SaveScore();
@@ -53,6 +55,11 @@ public class Leaderboard : MonoBehaviour
 
     public static void LoadDatabase()
     {
+        if ( !File.Exists(DatabasePath) )
+        {
+            File.Create(DatabasePath);
+        }
+
         dbConnection = new SqliteConnection($"Data Source={DatabasePath};Version=3;");
         dbConnection.Open();
     }
@@ -63,7 +70,9 @@ public class Leaderboard : MonoBehaviour
                     CREATE TABLE IF NOT EXISTS {tableName} (
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         PlayerName TEXT NOT NULL,
-                        Score INTEGER NOT NULL
+                        Score FLOAT NOT NULL,
+                        Difficulty INTEGER NOT NULL,
+                        Challenge BOOLEAN NOT NULL
                     )";
         using var command = new SqliteCommand(createTableQuery, dbConnection);
         command.ExecuteNonQuery();
@@ -81,7 +90,9 @@ public class Leaderboard : MonoBehaviour
                     scores.Add(new PlayerScore {
                         Id = reader.GetInt32(0),
                         PlayerName = reader.GetString(1),
-                        Score = reader.GetInt32(2)
+                        Score = reader.GetFloat(2),
+                        Difficulty = reader.GetInt32(3),
+                        Challenge = reader.GetBoolean(4)
                     });
                 }
             }
@@ -92,16 +103,19 @@ public class Leaderboard : MonoBehaviour
     private void DisplayScores()
     {
         int rank = 1;
+
         foreach ( var score in playerScores )
         {
             GameObject row = Instantiate(rowPrefab, rowsContainer.transform);
             var textComponents = row.GetComponentsInChildren<TextMeshProUGUI>();
 
-            textComponents[0].text = rank.ToString(); // Rank
+            textComponents[0].text = rank++.ToString(); // Rank
             textComponents[1].text = score.PlayerName; // Player Name
-            textComponents[2].text = score.Score.ToString(); // Score
-
-            rank++;
+            textComponents[3].text = score.Score.ToString(); // Score. Skipping index=2 cuz of Text component in Challenge Mode object
+            
+            var difficultyComponent = row.GetComponentInChildren<ChallengeModeToggle>();
+            difficultyComponent.IsOn = score.Challenge; // Set challanage mode indication
+            difficultyComponent.Difficulty = score.Difficulty; // Set difficulty level and color
 
             rows[score.Id] = row;
         }
@@ -109,6 +123,7 @@ public class Leaderboard : MonoBehaviour
         if ( GlobalVariables.Score != -1 ) // If the last game is over (win/lose)
         {
             titleTextObject.text = GlobalVariables.GameWon ? "Congratulations!" : "You Lost!";
+            // TODO: add sounds (win / lose)
             HightlightRow(lastGame);
             GlobalVariables.Score = -1;
         }
@@ -116,15 +131,20 @@ public class Leaderboard : MonoBehaviour
 
     public PlayerScore SaveScore()
     {
-        return SaveScore(new PlayerScore() { PlayerName = GlobalVariables.PlayerName, Score = GlobalVariables.Score });
+        return SaveScore(new PlayerScore() { 
+            Id = playerScores.Count + 1,
+            PlayerName = GlobalVariables.PlayerName, 
+            Score = GlobalVariables.Score, 
+            Difficulty = GlobalVariables.SelectedConfigIndex,
+            Challenge = GlobalVariables.ChallengeMode
+        });
     }
 
     private PlayerScore SaveScore(PlayerScore newScore)
     {
-        using var command = new SqliteCommand($"INSERT INTO {tableName} (PlayerName, Score) VALUES ({newScore})", dbConnection);
+        using var command = new SqliteCommand($"INSERT INTO {tableName} VALUES ({newScore})", dbConnection);
         command.ExecuteNonQuery();
         playerScores.Add(newScore);
-        newScore.Id = playerScores.Count;
         playerScores = playerScores.OrderByDescending(score => score.Score).ToList();
         return newScore;
     }
@@ -158,10 +178,12 @@ public class PlayerScore
 {
     public int Id { get; set; }
     public string PlayerName { get; set; }
-    public int Score { get; set; }
+    public float Score { get; set; }
+    public int Difficulty { get; set; }
+    public bool Challenge { get; set; }
 
     public override string ToString()
     {
-        return $"'{PlayerName}', {Score}";
+        return $"{Id}, '{PlayerName}', {Score}, {Difficulty}, {(Challenge? 1 : 0)}";
     }
 }
