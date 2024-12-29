@@ -14,7 +14,7 @@ public class SettingsWindow : MonoBehaviour
     public Toggle fullscreenToggle;
     public Resolution minimalResolution = new Resolution() { width=600, height=600 };
 
-    private Resolution[] availableResolutions;
+    private static Resolution[] availableResolutions;
     private float initialVolume;
     private bool initialMuteState;
     private Resolution initialResolution;
@@ -23,7 +23,7 @@ public class SettingsWindow : MonoBehaviour
     void Awake()
     {
         // Initialize resolution dropdown
-        availableResolutions = Screen.resolutions.Where((reso) => reso.width >= minimalResolution.width && reso.height >= minimalResolution.height).ToArray();
+        availableResolutions ??= Screen.resolutions.Where((reso) => reso.width >= minimalResolution.width && reso.height >= minimalResolution.height).ToArray(); // Load only once
         resolutionDropdown.ClearOptions();
         var options = new List<string>();
         foreach ( var res in availableResolutions )
@@ -95,7 +95,8 @@ public class SettingsWindow : MonoBehaviour
         GlobalVariables.Mute = initialMuteState;
         volumeSlider.value = initialVolume;
         muteToggle.isOn = initialMuteState;
-        resolutionDropdown.value = System.Array.IndexOf(availableResolutions, initialResolution);
+        resolutionDropdown.value = System.Array.IndexOf(availableResolutions, availableResolutions
+            .FirstOrDefault(r => r.width == initialResolution.width && r.height == initialResolution.height));
         resolutionDropdown.RefreshShownValue();
         Screen.SetResolution(initialResolution.width, initialResolution.height, initialFullscreenState);
         fullscreenToggle.isOn = initialFullscreenState;
