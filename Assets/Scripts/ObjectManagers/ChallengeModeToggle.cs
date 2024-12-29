@@ -25,6 +25,11 @@ public class ChallengeModeToggle : MonoBehaviour
         get { return toggle.isOn; }
         set { toggle.isOn = value; }
     }
+    public bool interactable
+    {
+        get { return toggle.interactable; }
+        set { toggle.interactable = value; }
+    }
 
     private TMP_Text label;
     public string Text

@@ -10,6 +10,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
+// Can also be a generic and abstract class but theres no real need for that (Leaderboard<PlayerScore> : Table<T> : OverlayWindwo (even less neccessary) : MonoBehaviour)
 public class Leaderboard : MonoBehaviour
 {
     public GameObject rowPrefab;
@@ -114,8 +116,9 @@ public class Leaderboard : MonoBehaviour
             textComponents[3].text = score.Score.ToString(); // Score. Skipping index=2 cuz of Text component in Challenge Mode object
             
             var difficultyComponent = row.GetComponentInChildren<ChallengeModeToggle>();
-            difficultyComponent.IsOn = score.Challenge; // Set challanage mode indication
             difficultyComponent.Difficulty = score.Difficulty; // Set difficulty level and color
+            difficultyComponent.IsOn = score.Challenge; // Set challanage mode indication
+            difficultyComponent.interactable = false;
 
             rows[score.Id] = row;
         }
