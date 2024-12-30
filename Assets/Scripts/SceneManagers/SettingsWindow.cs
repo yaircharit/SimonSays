@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// Allows the user to change the volume settings (volume level or mute), to change screen resolution and to enable/disable fullscreen
+/// </summary>
 public class SettingsWindow : MonoBehaviour
 {
     public Slider volumeSlider;
@@ -23,7 +26,7 @@ public class SettingsWindow : MonoBehaviour
     void Awake()
     {
         // Initialize resolution dropdown
-        availableResolutions ??= Screen.resolutions.Where((reso) => reso.width >= minimalResolution.width && reso.height >= minimalResolution.height).ToArray(); // Load only once
+        availableResolutions ??= Screen.resolutions.Where((reso) => reso.width >= minimalResolution.width && reso.height >= minimalResolution.height).ToArray(); // Load only once (??=)
         resolutionDropdown.ClearOptions();
         var options = new List<string>();
         foreach ( var res in availableResolutions )
@@ -74,23 +77,27 @@ public class SettingsWindow : MonoBehaviour
         Screen.fullScreen = fullscreenToggle.isOn;
     }
 
+    /// <summary>
+    /// Saves settings and moves back to main menu
+    /// </summary>
     public void ApplySettings()
     {
-        initialVolume = GlobalVariables.Volume;
-        initialMuteState = GlobalVariables.Mute;
-        initialResolution = GlobalVariables.Resolution;
-        initialFullscreenState = GlobalVariables.Fullscreen;
-        PlayerPrefs.Save();
+        PlayerPrefs.Save(); //Saves changes to PlayerPrefs (actually changed via GlobalVariables on-value-change)
         SceneManager.LoadScene("MainMenu");
     }
 
+    /// <summary>
+    /// Reverts all changes made and exits to main menu
+    /// </summary>
     public void CancelSettings()
     {
+        // Save initial state to GlobalVariables
         GlobalVariables.Volume = initialVolume;
         GlobalVariables.Mute = initialMuteState;
         GlobalVariables.Resolution = initialResolution;
         GlobalVariables.Fullscreen = initialFullscreenState;
 
+        // Revert changes made
         AudioListener.volume = initialVolume;
         GlobalVariables.Mute = initialMuteState;
         volumeSlider.value = initialVolume;
@@ -109,6 +116,7 @@ public class SettingsWindow : MonoBehaviour
     /// </summary>
     public static void LoadSettings()
     {
+        // GlobalVariables uses PlayerPrefs to save data between sessions
         AudioListener.volume = GlobalVariables.Mute ? 0 : GlobalVariables.Volume;
         Screen.SetResolution(GlobalVariables.Resolution.width, GlobalVariables.Resolution.height, Screen.fullScreen);
         Screen.fullScreen = GlobalVariables.Fullscreen;

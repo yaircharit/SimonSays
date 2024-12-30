@@ -1,10 +1,5 @@
 using Assets.Scripts;
-using Newtonsoft.Json.Linq;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Policy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,12 +47,7 @@ public class ChallengeModeToggle : MonoBehaviour
         set { checkmarkImage.color = value; }
     }
 
-    private int difficulty;
-    public int Difficulty
-    {
-        get { return difficulty; }
-        set { SetDifficulty(value); }
-    }
+    public int difficulty;
 
     private void Awake()
     {
@@ -97,8 +87,8 @@ public class ChallengeModeToggle : MonoBehaviour
         } else
         {
             Text = $"x{gameSpeeds[difficulty]}"; // x1.5
+            checkmarkColor = difficultyColors[difficulty % 2 + 1]; // For silver trophy (Medium) set star to gold, For gold set it to silver TODO: handle this better
             toggle.interactable = true;
-            checkmarkColor = difficultyColors[difficulty % 2 + 1]; // For silver trophy (Medium) set star to gold, For gold set it to silver
         }
 
         return toggle.interactable;

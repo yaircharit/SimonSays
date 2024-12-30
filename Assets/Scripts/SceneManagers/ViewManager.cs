@@ -5,6 +5,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Handles all the visualization of in the GameScene. 
+/// </summary>
 public class ViewManager : MonoBehaviour
 {
     public static ViewManager Instance { get; private set; }
@@ -23,7 +26,6 @@ public class ViewManager : MonoBehaviour
     public GameObject leaderboardWindow;
 
     private static GameButton[] buttons;
-
 
     private void Awake()
     {
@@ -90,6 +92,9 @@ public class ViewManager : MonoBehaviour
         overlayWindow.OpenWindow();
     }
 
+    /// <summary>
+    /// Checks for player input (ESC = Quit, Space = RepeatSeqence)
+    /// </summary>
     private void Update()
     {
         if ( Input.GetKeyDown(KeyCode.Escape) )

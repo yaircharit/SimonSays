@@ -1,11 +1,11 @@
 using Assets.Scripts;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// An overlay that also contains a text input for player's name and a toggle button to enable/disable ChallengeMode
+/// </summary>
 public class PlayerNameOverlayWindow : OverlayWindow
 {
     public TMPro.TMP_InputField textInputField;
@@ -22,17 +22,20 @@ public class PlayerNameOverlayWindow : OverlayWindow
     public override void OpenWindow()
     {
         base.OpenWindow();
-        textInputField.text = GlobalVariables.PlayerName;
 
-        toggle.IsOn = GlobalVariables.ChallengeMode;    // Restore state from previous game
-        toggle.Difficulty = GlobalVariables.SelectedConfigIndex; // Set the difficulty, text, and color
+        // Restore name and state from previous game
+        textInputField.text = GlobalVariables.PlayerName;
+        toggle.IsOn = GlobalVariables.ChallengeMode;
+
+        // Set the difficulty, text, and color to reflect the selected difficulty
+        toggle.SetDifficulty(GlobalVariables.SelectedConfigIndex); 
     }
 
     public override void OnSubmit()
     {
         string playerName = textInputField.text.Trim();
 
-        // Verify the player input
+        // Require player input
         if ( playerName == "" )
         {
             textInputField.GetComponent<Image>().color = noInputColor;

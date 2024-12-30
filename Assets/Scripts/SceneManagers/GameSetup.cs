@@ -1,13 +1,13 @@
 using Assets.Scripts;
-using ConfigurationLoader;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// Allows the user to choose which difficulty to play in (from configuration file).
+/// Requires the player to enter a name and allows to play in ChallengeMode (via PlayerNameOverlayWindow)
+/// </summary>
 public class GameSetup : MonoBehaviour
 {
     

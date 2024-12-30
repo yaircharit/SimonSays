@@ -5,7 +5,6 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -102,6 +101,9 @@ public class Leaderboard : MonoBehaviour
         return scores;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     private void DisplayScores()
     {
         int rank = 1;
@@ -116,7 +118,7 @@ public class Leaderboard : MonoBehaviour
             textComponents[3].text = score.Score.ToString(); // Score. Skipping index=2 cuz of Text component in Challenge Mode object
             
             var difficultyComponent = row.GetComponentInChildren<ChallengeModeToggle>();
-            difficultyComponent.Difficulty = score.Difficulty; // Set difficulty level and color
+            difficultyComponent.SetDifficulty(score.Difficulty); // Set difficulty level and color
             difficultyComponent.IsOn = score.Challenge; // Set challanage mode indication
             difficultyComponent.interactable = false;
 
@@ -157,12 +159,20 @@ public class Leaderboard : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
+    /// <summary>
+    /// Highlight and scroll to a spesific PlayerScore displayed in the leaderboard table
+    /// </summary>
+    /// <param name="playerScore">PlayerScore to highlight</param>
     public void HightlightRow(PlayerScore playerScore)
     {
         rows[playerScore.Id].GetComponent<Image>().color = hightlightColor;
         ScrollTo(playerScore);
     }
 
+    /// <summary>
+    /// Scroll to the specified PlayerScore in the leaderboard table
+    /// </summary>
+    /// <param name="playerScore">PlayerScore to scroll to</param>
     public void ScrollTo(PlayerScore playerScore)
     {
         Canvas.ForceUpdateCanvases();
