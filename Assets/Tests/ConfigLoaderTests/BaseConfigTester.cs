@@ -1,21 +1,48 @@
 using ConfigurationLoader;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace ConfigLoaderUnitTests
 {
-    public abstract class ConfigTesterBase
+    public abstract class ConfigTesterBase : ScriptableObject
     {
-        protected abstract string ConfigFilePath { get; }
-        protected abstract string NonCompConfigFilePath { get; }
-        protected abstract string NonExistingConfigFilePath { get; }
-        protected Dictionary<string, Configuration> configData = null!;
+        protected abstract string FileExtension { get; }
+        
+        private string ConfigsFolderPath => Path.Combine(Directory.GetCurrentDirectory(), @"Assets\Tests\ConfigLoaderTests\ConfigFiles");
 
-        [TestInitialize]
-        public void Setup()
+        private string _configFileName = "config";
+        public string ConfigFileName => $"{_configFileName}.{FileExtension}";
+
+
+        private string _nonCompConfigFileName = "non_compatible_config";
+        public string NonCompConfigFileName => $"{_nonCompConfigFileName}.{FileExtension}";
+
+
+        private string _nonExistingConfigFileeName = "non_existing_config";
+        public string NonExistingConfigFileeName => $"{_nonExistingConfigFileeName}.{FileExtension}";
+
+        private string GetFullPathToFile(string filename)
         {
-            configData = ConfigLoader<Configuration>.LoadConfig(ConfigFilePath).ToDictionary(config => config.Name, config => config);
+            return Path.Combine(ConfigsFolderPath,filename);
         }
 
-        [TestMethod]
+        protected Dictionary<string, Configuration> configData = null!;
+
+        [SetUp]
+        public void Setup()
+        {
+            var temp = GetFullPathToFile(ConfigFileName);
+            configData = ConfigLoader<Configuration>.LoadConfig(GetFullPathToFile(ConfigFileName))
+                .ToDictionary(config => config.Name, config => config);
+        }
+
+        [Test]
         public void TestLoad()
         {
             var configKeys = configData.Keys;
@@ -25,7 +52,7 @@ namespace ConfigLoaderUnitTests
             CollectionAssert.DoesNotContain(configKeys, "Extreme");
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetValue_Easy()
         {
             var config = configData["Easy"];
@@ -37,7 +64,7 @@ namespace ConfigLoaderUnitTests
             Assert.AreEqual(1.0f, config.GameSpeed);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetValue_Medium()
         {
             var config = configData["Medium"];
@@ -49,7 +76,7 @@ namespace ConfigLoaderUnitTests
             Assert.AreEqual(1.25f, config.GameSpeed);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetValue_Hard()
         {
             var config = configData["Hard"];
@@ -61,18 +88,22 @@ namespace ConfigLoaderUnitTests
             Assert.AreEqual(1.5f, config.GameSpeed);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(FileNotFoundException))]
+        [Test]
         public void TestLoadNonExistingFile()
         {
-            ConfigLoader<Configuration>.LoadConfig(NonExistingConfigFilePath);
+            Assert.That(() =>
+                ConfigLoader<Configuration>.LoadConfig(GetFullPathToFile(NonExistingConfigFileeName)),
+                Throws.TypeOf<FileNotFoundException>()
+            );
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Test]
         public void TestLoadNonCompatibleFile()
         {
-            ConfigLoader<Configuration>.LoadConfig(NonCompConfigFilePath);
+            Assert.That(() =>
+                ConfigLoader<Configuration>.LoadConfig(GetFullPathToFile(NonCompConfigFileName)),
+                Throws.TypeOf<InvalidOperationException>()
+            );
         }
     }
 }

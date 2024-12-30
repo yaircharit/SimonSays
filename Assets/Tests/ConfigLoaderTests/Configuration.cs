@@ -1,5 +1,5 @@
 ﻿
-using System.Security.Policy;
+using System;
 using System.Windows.Markup;
 
 namespace ConfigurationLoader
