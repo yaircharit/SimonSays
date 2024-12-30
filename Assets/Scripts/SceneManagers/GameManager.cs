@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour
     {
         ViewManager.EnableButtons(false);   // Disable buttons so user can't change the sequence while playing
         sequence.Add(rand.Next(GlobalVariables.SelectedConfig.GameButtons));    // Get the next buttons of the sequencec
-        StartCoroutine(ViewManager.Instance.PlaySequance());
+        ViewManager.Instance.HandleRepeatButtonClick();
     }
 
     /// <summary>

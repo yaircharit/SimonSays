@@ -26,6 +26,7 @@ public class ViewManager : MonoBehaviour
     public GameObject leaderboardWindow;
 
     private static GameButton[] buttons;
+    private Coroutine playSeqenceCoroutine;
 
     private void Awake()
     {
@@ -84,7 +85,12 @@ public class ViewManager : MonoBehaviour
 
     public void HandleRepeatButtonClick()
     {
-        StartCoroutine(PlaySequance());
+        if ( playSeqenceCoroutine != null )
+        {
+            StopCoroutine(playSeqenceCoroutine); // Stop previous sequence playing
+        }
+
+        playSeqenceCoroutine = StartCoroutine(PlaySequance()); // Start new sequence play
     }
 
     public void HandleExitButtonClick()
@@ -92,15 +98,12 @@ public class ViewManager : MonoBehaviour
         overlayWindow.OpenWindow();
     }
 
-    /// <summary>
-    /// Checks for player input (ESC = Quit, Space = RepeatSeqence)
-    /// </summary>
     private void Update()
     {
         if ( Input.GetKeyDown(KeyCode.Escape) )
         {
             HandleExitButtonClick();
-        } else if ( Input.GetKeyDown(KeyCode.Space) )
+        } else if ( Input.GetKeyDown(KeyCode.Space) && GlobalVariables.SelectedConfig.RepeatMode )
         {
             HandleRepeatButtonClick();
         }
@@ -122,5 +125,6 @@ public class ViewManager : MonoBehaviour
         }
 
         EnableButtons(true);
+        playSeqenceCoroutine = null; // Clear
     }
 }
