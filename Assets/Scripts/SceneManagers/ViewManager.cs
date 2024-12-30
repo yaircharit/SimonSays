@@ -1,6 +1,7 @@
 using Assets.Scripts;
 using System;
 using System.Collections;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,7 +36,7 @@ public class ViewManager : MonoBehaviour
         overlayWindow = overlayWindowObject.GetComponent<OverlayWindow>();
 
         // Apply selected config
-        repeatButton.gameObject.SetActive(GlobalVariables.SelectedConfig.RepeatMode);
+        repeatButton.gameObject.SetActive(!GlobalVariables.ChallengeMode);
         SpawnButtons(GlobalVariables.SelectedConfig.GameButtons);
     }
 
@@ -103,7 +104,7 @@ public class ViewManager : MonoBehaviour
         if ( Input.GetKeyDown(KeyCode.Escape) )
         {
             HandleExitButtonClick();
-        } else if ( Input.GetKeyDown(KeyCode.Space) && GlobalVariables.SelectedConfig.RepeatMode )
+        } else if ( Input.GetKeyDown(KeyCode.Space) && !GlobalVariables.ChallengeMode )
         {
             HandleRepeatButtonClick();
         }
@@ -117,14 +118,27 @@ public class ViewManager : MonoBehaviour
         EnableButtons(false);
         yield return new WaitForSeconds(defaultGameDelay * 1.5f); // Little pause before next round
 
+        if ( !GlobalVariables.SelectedConfig.RepeatMode )
+        {
+            // Play only the last button in sequence
+            yield return PlayButton(GameManager.sequence.Last());
+            EnableButtons(true);
+            yield break;
+        }
+
         // play sequance
         foreach ( var butt in GameManager.sequence )
         {
-            StartCoroutine(buttons[butt].ActivateButton());
-            yield return new WaitForSeconds(defaultGameDelay);
+            yield return PlayButton(butt);
         }
 
         EnableButtons(true);
         playSeqenceCoroutine = null; // Clear
+    }
+
+    private IEnumerator PlayButton(int index)
+    {
+        StartCoroutine(buttons[index].ActivateButton());
+        yield return new WaitForSeconds(defaultGameDelay);
     }
 }
