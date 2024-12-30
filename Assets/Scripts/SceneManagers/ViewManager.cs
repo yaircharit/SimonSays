@@ -133,7 +133,7 @@ public class ViewManager : MonoBehaviour
             yield return PlayButton(butt);
         }
 
-        EnableButtons(true);
+        EnableButtons(!overlayWindow.IsActive); // What if the sequence is playing while overlay window is open? stay disabled
         playSeqenceCoroutine = null; // Clear
     }
 
