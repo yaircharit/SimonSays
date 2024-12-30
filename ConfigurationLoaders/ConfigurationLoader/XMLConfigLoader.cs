@@ -1,6 +1,8 @@
-﻿using System.Xml;
+﻿using System.Data.SqlTypes;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ConfigurationLoader
 {
@@ -18,45 +20,26 @@ namespace ConfigurationLoader
         }
 
         /// <summary>
-        /// Parses the raw XML data and populates the configuration dictionary.
+        /// Deserilizes the raw XML data.
         /// </summary>
-        /// <param name="rawData">The raw XML data as a string.</param>
-        /// <exception cref="InvalidOperationException">Thrown when the raw data cannot be deserialized.</exception>
-        protected override void ParseRawData(string rawData)
+        protected override List<T> Deserialize(string rawData)
         {
-            try
+
+            var xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(rawData);
+
+            //// Check if the XML document has a root element
+            //if ( xmlDoc.DocumentElement == null )
+            //{
+            //    throw new InvalidOperationException("The XML document is missing a root element.");
+            //}
+
+            var serializer = new XmlSerializer(typeof(List<T>), new XmlRootAttribute(xmlDoc.DocumentElement.Name));
+            using ( var reader = new StringReader(xmlDoc.InnerXml) )
             {
-                var xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(rawData);
-
-                // Check if the XML document has a root element
-                if ( xmlDoc.DocumentElement == null )
-                {
-                    throw new InvalidOperationException("The XML document is missing a root element.");
-                }
-
-                // Iterate through each child node of the root element
-                foreach ( XmlNode section in xmlDoc.DocumentElement.ChildNodes )
-                {
-                    var serializer = new XmlSerializer(typeof(T), new XmlRootAttribute(section.Name));
-                    using ( var reader = new StringReader(section.OuterXml) )
-                    {
-                        // Deserialize the XML node into a Configuration object
-                        var configuration = (T)serializer.Deserialize(reader);
-                        if ( configuration == null )
-                        {
-                            throw new InvalidOperationException($"Failed to deserialize configuration for section {section.Name}.");
-                        }
-
-                        // Add the configuration to the dictionary
-                        Data[section.Name] = configuration;
-                    }
-                }
+                return (List<T>)serializer.Deserialize(reader);
             }
-            catch ( Exception ex )
-            {
-                throw new InvalidOperationException("Failed to parse XML data.", ex);
-            }
+
         }
     }
 }

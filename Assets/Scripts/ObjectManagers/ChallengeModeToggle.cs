@@ -64,7 +64,7 @@ public class ChallengeModeToggle : MonoBehaviour
         if ( gameSpeeds == null )
         {
             // Save all possible game speeds
-            gameSpeeds = GlobalVariables.Configs.Values.Select(config => config.GameSpeed).ToArray();
+            gameSpeeds = GlobalVariables.Configs.Select(config => config.GameSpeed).ToArray();
         }
         toggle = gameObject.GetComponent<Toggle>();
         label = gameObject.GetComponentInChildren<TMP_Text>();

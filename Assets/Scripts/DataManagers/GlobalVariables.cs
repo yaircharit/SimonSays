@@ -9,6 +9,11 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts
 {
+    /// <summary>
+    /// This class is used to hold and reference all required variables throughout the game.
+    /// Using PlayerPrefs to store settings between sessions
+    /// Init must be called to load all needed data from config and database files
+    /// </summary>
     public class GlobalVariables
     {
         // PlayerPrefs keys
@@ -24,10 +29,11 @@ namespace Assets.Scripts
 
         public static string configFileName = "config.json";
         public static string ConfigPath => Path.Combine(Application.streamingAssetsPath, configFileName);
-        public static Dictionary<string, AppConfig> Configs;
+        public static List<AppConfig> Configs;
         public static AppConfig SelectedConfig { get; set; }
-        public static int SelectedConfigIndex => Configs.Values.ToList().IndexOf(SelectedConfig);
-        
+        public static int SelectedConfigIndex => Configs.IndexOf(SelectedConfig);
+
+
         public static bool GameWon { get; set; }
         public static string PlayerName
         {

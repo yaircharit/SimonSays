@@ -1,24 +1,27 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Configurations>
-  <Easy>
+  <AppConfig>
+    <Name>Easy</Name>
     <GameButtons>4</GameButtons>
     <PointsEachStep>1</PointsEachStep>
     <GameTime>50</GameTime>
     <RepeatMode>true</RepeatMode>
     <GameSpeed>1.0</GameSpeed>
-  </Easy>
-  <Medium>
+  </AppConfig>
+  <AppConfig>
+    <Name>Medium</Name>
     <GameButtons>5</GameButtons>
     <PointsEachStep>2</PointsEachStep>
     <GameTime>45</GameTime>
     <RepeatMode>true</RepeatMode>
     <GameSpeed>1.25</GameSpeed>
-  </Medium>
-  <Hard>
+  </AppConfig>
+  <AppConfig>
+    <Name>Hard</Name>
     <GameButtons>6</GameButtons>
     <PointsEachStep>3</PointsEachStep>
     <GameTime>30</GameTime>
     <RepeatMode>false</RepeatMode>
     <GameSpeed>1.5</GameSpeed>
-  </Hard>
+  </AppConfig>
 </Configurations>

@@ -22,11 +22,11 @@ public class GameSetup : MonoBehaviour
         overlayWindow = overlayWindowObject.GetComponent<PlayerNameOverlayWindow>();
 
         // Initialize buttons for each config
-        foreach ( var cnf in GlobalVariables.Configs.Keys )
+        foreach ( var cnf in GlobalVariables.Configs )
         {
             Button tempButt = Instantiate(buttonPrefab, gameObject.transform).GetComponent<Button>();
-            tempButt.GetComponentInChildren<TextMeshProUGUI>().text = cnf;
-            tempButt.onClick.AddListener(() => OnButtonClick(GlobalVariables.Configs[cnf]));
+            tempButt.GetComponentInChildren<TextMeshProUGUI>().text = cnf.Name;
+            tempButt.onClick.AddListener(() => OnButtonClick(cnf));
         }
     }
 

@@ -12,7 +12,7 @@ namespace ConfigLoaderUnitTests
         [TestInitialize]
         public void Setup()
         {
-            configData = ConfigLoader<Configuration>.LoadConfig(ConfigFilePath);
+            configData = ConfigLoader<Configuration>.LoadConfig(ConfigFilePath).ToDictionary(config => config.Name, config => config);
         }
 
         [TestMethod]
