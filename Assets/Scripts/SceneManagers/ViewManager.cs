@@ -28,6 +28,7 @@ public class ViewManager : MonoBehaviour
 
     private static GameButton[] buttons;
     private Coroutine playSeqenceCoroutine;
+    private float GameDelay => defaultGameDelay / GlobalVariables.SelectedConfig.GameSpeed;
 
     private void Awake()
     {
@@ -116,7 +117,7 @@ public class ViewManager : MonoBehaviour
     public IEnumerator PlaySequance()
     {
         EnableButtons(false);
-        yield return new WaitForSeconds(defaultGameDelay * 1.5f); // Little pause before next round
+        yield return new WaitForSeconds(GameDelay * 1.5f); // Little pause before next round
 
         if ( !GlobalVariables.SelectedConfig.RepeatMode )
         {
@@ -139,6 +140,6 @@ public class ViewManager : MonoBehaviour
     private IEnumerator PlayButton(int index)
     {
         StartCoroutine(buttons[index].ActivateButton());
-        yield return new WaitForSeconds(defaultGameDelay);
+        yield return new WaitForSeconds(GameDelay);
     }
 }
