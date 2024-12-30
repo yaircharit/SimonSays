@@ -184,6 +184,11 @@ public class Leaderboard : MonoBehaviour
 
         containerRectTransform.anchoredPosition = new Vector2(containerRectTransform.anchoredPosition.x, rowPosition.y - (rowHeight * 10));
     }
+
+    public void OnApplicationQuit()
+    {
+        dbConnection.Close(); 
+    }
 }
 
 [System.Serializable]
