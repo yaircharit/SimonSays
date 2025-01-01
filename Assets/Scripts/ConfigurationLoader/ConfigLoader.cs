@@ -13,10 +13,12 @@ namespace ConfigurationLoader
 
         private static ConfigLoader<T> instance = null;
 
+        private static readonly object padlock = new object();
+
         public static ConfigLoader<T> Instance
         {
             get {
-                lock ( instance )
+                lock ( padlock )
                 {
                     if ( instance == null )
                     {
@@ -26,7 +28,7 @@ namespace ConfigurationLoader
                 }
             }
             private set {
-                lock ( instance )
+                lock ( padlock )
                 {
                     instance = value;
                 }
