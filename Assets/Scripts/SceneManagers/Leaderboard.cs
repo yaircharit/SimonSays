@@ -18,14 +18,10 @@ public class Leaderboard : MonoBehaviour
     public GameObject rowsContainer;
     public Color hightlightColor = Color.yellow;
 
-    private static string databaseFileName;
-    private static string tableName;
-    private static SqliteConnection dbConnection;
     private static List<PlayerScore> playerScores;
     private Dictionary<int, GameObject> rows;
     private PlayerScore lastGame;
-
-    private static string DatabasePath => Path.Combine(Application.streamingAssetsPath, databaseFileName);
+    private static LeaderboardRepository repository;
 
     void Awake()
     {
@@ -42,68 +38,13 @@ public class Leaderboard : MonoBehaviour
 
     public static void Init(string dbFileName, string tableName)
     {
-
-        if ( dbConnection == null )
+        if ( repository == null )
         {
-            Leaderboard.tableName = tableName;
-            Leaderboard.databaseFileName = dbFileName;
-
-            LoadDatabase();
-            CreateTable();
-            playerScores = LoadScores();
+            repository = new LeaderboardRepository(dbFileName, tableName);
+            playerScores = repository.LoadScores();
         }
     }
 
-    public static void LoadDatabase()
-    {
-        if ( !File.Exists(DatabasePath) )
-        {
-            File.Create(DatabasePath);
-        }
-
-        dbConnection = new SqliteConnection($"Data Source={DatabasePath};Version=3;");
-        dbConnection.Open();
-    }
-
-    private static void CreateTable()
-    {
-        string createTableQuery = @$"
-                    CREATE TABLE IF NOT EXISTS {tableName} (
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        PlayerName TEXT NOT NULL,
-                        Score FLOAT NOT NULL,
-                        Difficulty INTEGER NOT NULL,
-                        Challenge BOOLEAN NOT NULL
-                    )";
-        using var command = new SqliteCommand(createTableQuery, dbConnection);
-        command.ExecuteNonQuery();
-    }
-
-    private static List<PlayerScore> LoadScores()
-    {
-        var scores = new List<PlayerScore>();
-        using ( var command = new SqliteCommand($"SELECT * FROM {tableName} ORDER BY Score DESC", dbConnection) )
-        {
-            using ( var reader = command.ExecuteReader() )
-            {
-                while ( reader.Read() )
-                {
-                    scores.Add(new PlayerScore {
-                        Id = reader.GetInt32(0),
-                        PlayerName = reader.GetString(1),
-                        Score = reader.GetFloat(2),
-                        Difficulty = reader.GetInt32(3),
-                        Challenge = reader.GetBoolean(4)
-                    });
-                }
-            }
-        }
-        return scores;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
     private void DisplayScores()
     {
         int rank = 1;
@@ -116,7 +57,7 @@ public class Leaderboard : MonoBehaviour
             textComponents[0].text = rank++.ToString(); // Rank
             textComponents[1].text = score.PlayerName; // Player Name
             textComponents[3].text = score.Score.ToString(); // Score. Skipping index=2 cuz of Text component in Challenge Mode object
-            
+
             var difficultyComponent = row.GetComponentInChildren<ChallengeModeToggle>();
             difficultyComponent.SetDifficulty(score.Difficulty); // Set difficulty level and color
             difficultyComponent.IsOn = score.Challenge; // Set challanage mode indication
@@ -136,10 +77,10 @@ public class Leaderboard : MonoBehaviour
 
     public PlayerScore SaveScore()
     {
-        return SaveScore(new PlayerScore() { 
+        return SaveScore(new PlayerScore() {
             Id = playerScores.Count + 1,
-            PlayerName = GlobalVariables.PlayerName, 
-            Score = GlobalVariables.Score, 
+            PlayerName = GlobalVariables.PlayerName,
+            Score = GlobalVariables.Score,
             Difficulty = GlobalVariables.SelectedConfigIndex,
             Challenge = GlobalVariables.ChallengeMode
         });
@@ -147,8 +88,7 @@ public class Leaderboard : MonoBehaviour
 
     private PlayerScore SaveScore(PlayerScore newScore)
     {
-        using var command = new SqliteCommand($"INSERT INTO {tableName} VALUES ({newScore})", dbConnection);
-        command.ExecuteNonQuery();
+        repository.SaveScore(newScore);
         playerScores.Add(newScore);
         playerScores = playerScores.OrderByDescending(score => score.Score).ToList();
         return newScore;
@@ -159,20 +99,12 @@ public class Leaderboard : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
-    /// <summary>
-    /// Highlight and scroll to a spesific PlayerScore displayed in the leaderboard table
-    /// </summary>
-    /// <param name="playerScore">PlayerScore to highlight</param>
     public void HightlightRow(PlayerScore playerScore)
     {
         rows[playerScore.Id].GetComponent<Image>().color = hightlightColor;
         ScrollTo(playerScore);
     }
 
-    /// <summary>
-    /// Scroll to the specified PlayerScore in the leaderboard table
-    /// </summary>
-    /// <param name="playerScore">PlayerScore to scroll to</param>
     public void ScrollTo(PlayerScore playerScore)
     {
         Canvas.ForceUpdateCanvases();
@@ -187,7 +119,7 @@ public class Leaderboard : MonoBehaviour
 
     public void OnApplicationQuit()
     {
-        dbConnection.Close(); 
+        repository.CloseConnection();
     }
 }
 
@@ -202,6 +134,6 @@ public class PlayerScore
 
     public override string ToString()
     {
-        return $"{Id}, '{PlayerName}', {Score}, {Difficulty}, {(Challenge? 1 : 0)}";
+        return $"{Id}, '{PlayerName}', {Score}, {Difficulty}, {(Challenge ? 1 : 0)}";
     }
 }
