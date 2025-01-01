@@ -19,10 +19,8 @@ public class PlayerNameOverlayWindow : OverlayWindow
         toggle = challengeModeToggleGameObject.GetComponent<ChallengeModeToggle>();
     }
 
-    public override void OpenWindow()
+    protected override void OnOpen()
     {
-        base.OpenWindow();
-
         // Restore name and state from previous game
         textInputField.text = GlobalVariables.PlayerName;
         toggle.IsOn = GlobalVariables.ChallengeMode;

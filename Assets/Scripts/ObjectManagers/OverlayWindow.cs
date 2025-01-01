@@ -6,14 +6,28 @@ namespace Assets.Scripts
     {
         internal bool IsActive => gameObject.activeSelf;
 
-        public virtual void OpenWindow()
+        public void OpenWindow()
         {
             gameObject.SetActive(true);
+            OnOpen();
         }
-        public virtual void CloseWindow()
+
+        public void CloseWindow()
         {
+            OnClose();
             gameObject.SetActive(false);
         }
+
+        protected virtual void OnOpen()
+        {
+            // Optional hook for subclasses to implement behavior when the window opens
+        }
+
+        protected virtual void OnClose()
+        {
+            // Optional hook for subclasses to implement behavior when the window closes
+        }
+
         public abstract void OnSubmit(); // Should be different for each overlay window type.
     }
 }

@@ -3,15 +3,13 @@ using UnityEngine.SceneManagement;
 
 public class OnExitOverlayWindow : OverlayWindow
 {
-    public override void CloseWindow()
+    protected override void OnClose()
     {
-        base.CloseWindow();
         ViewManager.EnableButtons(true);
     }
 
-    public override void OpenWindow()
+    protected override void OnOpen()
     {
-        base.OpenWindow();
         ViewManager.EnableButtons(false);
     }
 
