@@ -4,24 +4,6 @@ using System.IO;
 
 namespace ConfigurationLoader
 {
-    /*Implenetation of a configuration loader- an absract and generic class that is respnosible 
-     * to load, read and deserialize a data file (Json, xml, yml, etc..)
-     * 
-     * To use it you need to inherit this class and Implement the 'Deserialize' function in relation with the data type.
-     * After creating a new class it should be added to the case list in the LoadConfiguration<T> function below.
-     * 
-     * The user can pass the wanted object type to deserialize to (type T).
-     * Allowing the usage of this ConfigLoader<T> class in many versatile cases.
-     * 
-     * The loader and deserialization are returning a list of objects (and not a dictionary) to better handle the deserialization (what would be the key in a list?)
-     * The returned list can be mapped by the user afterwards as needed.
-     * 
-     * There could be different approach- to pass on the Deserialize function from outside of this library.
-     * But in my opinion this class library should handle this internaly since there shouldn't be a difference between parsing several
-     * configs of the same type (json for example) even if they are for different applications.
-     */
-
-
     /// <summary>
     /// Abstract and generic class representing a configuration loader.
     /// </summary>
@@ -29,7 +11,27 @@ namespace ConfigurationLoader
     {
         protected string configPath;
 
-        public static ConfigLoader<T> Instance { get; private set; }
+        private static ConfigLoader<T> instance = null;
+
+        public static ConfigLoader<T> Instance
+        {
+            get {
+                lock ( instance )
+                {
+                    if ( instance == null )
+                    {
+                        throw new InvalidOperationException("Instance not created. Call LoadConfig method first.");
+                    }
+                    return instance;
+                }
+            }
+            private set {
+                lock ( instance )
+                {
+                    instance = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigLoader"/> class.
@@ -64,7 +66,7 @@ namespace ConfigurationLoader
         {
 
             string rawData = File.ReadAllText(configPath); // Not in try/catch to throw the appropriate exception of File.ReadAllText
-            
+
             try
             {
                 return Deserialize(rawData);
