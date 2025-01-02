@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,45 +11,58 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public static bool isRunning = false;
-    public static int score = 0;
-    public static float time = 999;
+    public static bool IsRunning { get; private set; } = false;
+    public static int Score { get; private set; } = 0;
+    public static float TimeRemaining { get; private set; } = 999;
 
-    public static List<int> sequence = new List<int>();
-    public static int sequenceIndex = 0;
+    public static List<int> Sequence { get; private set; } = new List<int>();
+    public static int SequenceIndex { get; private set; } = 0;
 
-    readonly static System.Random rand = new System.Random();
+    public static event Action<int> OnScoreChanged;
+    public static event Action<int> OnTimeChanged;
+    public static event Action<bool> OnGameEnded;
+
+    private static readonly System.Random rand = new System.Random();
+
+    static GameManager()
+    {
+        GameButton.OnButtonPress += CheckSequence;
+    }
 
     private void Awake()
     {
         Instance = this;
-        sequence.Clear();
-        sequenceIndex = 0;
-        score = 0;
-        time = GlobalVariables.SelectedConfig.GameTime;
+
+        InitializeGame();
+    }
+
+    private void InitializeGame()
+    {
+        Sequence.Clear();
+        SequenceIndex = 0;
+        Score = 0;
+        TimeRemaining = GlobalVariables.SelectedConfig.GameTime;
         if ( GlobalVariables.ChallengeMode )
         {
             Time.timeScale = GlobalVariables.SelectedConfig.GameSpeed; // Set game speed if challenge mode was selected
         }
 
-        isRunning = true;
+        IsRunning = true;
     }
 
-    // Starts the game
     private void Start()
     {
         NextRound();
     }
 
-    // Update time and check if the game is over
     private void FixedUpdate()
     {
-        if ( isRunning )
+        if ( IsRunning )
         {
-            if ( time > 0 )
+            if ( TimeRemaining > 0 )
             {
-                time -= Time.deltaTime;
-                ViewManager.Instance.UpdateTime((int)time);
+                TimeRemaining -= Time.deltaTime;
+                OnTimeChanged?.Invoke((int)TimeRemaining);
             } else
             {
                 // Game won!
@@ -60,10 +74,10 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Adds a new step to the sequence and plays it
     /// </summary>
-    private void NextRound()
+    private static void NextRound()
     {
         ViewManager.EnableButtons(false);   // Disable buttons so user can't change the sequence while playing
-        sequence.Add(rand.Next(GlobalVariables.SelectedConfig.GameButtons));    // Get the next buttons of the sequencec
+        Sequence.Add(rand.Next(GlobalVariables.SelectedConfig.GameButtons));    // Get the next buttons of the sequence
         ViewManager.Instance.HandleRepeatButtonClick();
     }
 
@@ -71,20 +85,19 @@ public class GameManager : MonoBehaviour
     /// Checks if the index is the next one in the sequence
     /// </summary>
     /// <param name="index">button index</param>
-    public void CheckSequence(int index)
+    public static void CheckSequence(int index)
     {
-        if ( sequence[sequenceIndex++] == index )
+        if ( Sequence[SequenceIndex++] == index )
         {
             // Correct button pressed
 
-            if ( sequenceIndex == sequence.Count )
+            if ( SequenceIndex == Sequence.Count )
             {
                 // All sequence pressed correctly
-                
-                score += GlobalVariables.SelectedConfig.PointsEachStep;
-                ViewManager.Instance.UpdateScore(score);
-                sequenceIndex = 0;
 
+                Score += GlobalVariables.SelectedConfig.PointsEachStep;
+                OnScoreChanged?.Invoke(Score);
+                SequenceIndex = 0;
                 NextRound();
             }
         } else
@@ -98,12 +111,11 @@ public class GameManager : MonoBehaviour
     /// Ends the game and moves to Leaderboard scene
     /// </summary>
     /// <param name="gameWon">true if the game was won; false if lost</param>
-    public void EndGame(bool gameWon)
+    public static void EndGame(bool gameWon)
     {
-        GlobalVariables.Score = score * (GlobalVariables.ChallengeMode? GlobalVariables.SelectedConfig.GameSpeed : 1); // TODO: Add animation
+        GlobalVariables.Score = Score * (GlobalVariables.ChallengeMode ? GlobalVariables.SelectedConfig.GameSpeed : 1);
         GlobalVariables.GameWon = gameWon;
         Time.timeScale = 1; // back to normal
-        SceneManager.LoadScene("Leaderboard");
+        OnGameEnded?.Invoke(gameWon);
     }
-   
 }

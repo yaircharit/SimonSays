@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -11,25 +12,27 @@ public class GameButton : MonoBehaviour
     public Sprite buttonSprite;
     public Sprite pressedButtonSprite;
 
-    private Color color;
     private int index;
 
     private AudioSource audioSource;
     private SpriteRenderer spriteRenderer;
 
-    public void Awake()
+    public static event Action<int> OnButtonPress;
+
+    private void Awake()
     {
         // Keeps track on its own how many buttons are there and assigns color relatively
         index = buttonCount++;
-        color = ViewManager.Instance.buttonColors[index];
 
         // Set color
         spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.color = color;
+        spriteRenderer.color = ViewManager.ButtonColors[index];
 
         // Set audioclip
         audioSource = GetComponent<AudioSource>();
         audioSource.clip = GetComponentInParent<ViewManager>().sounds[index];
+
+        enabled = false; //disable until the game starts
     }
 
     private void OnDestroy()
@@ -38,23 +41,24 @@ public class GameButton : MonoBehaviour
         buttonCount--;
     }
 
-    public void OnMouseDown()
+
+    private void OnMouseDown()
     {
         if ( enabled )
         {
             StartCoroutine(ActivateButton());
-            GameManager.Instance.CheckSequence(index); // Check if its the right button to press
+            OnButtonPress?.Invoke(index);
         }
     }
 
     /// <summary>
-    /// Plays the button's
+    /// Plays the button's animation
     /// </summary>
     /// <returns>Finishes after the audioclip is done playing</returns>
     public IEnumerator ActivateButton()
     {
         spriteRenderer.sprite = pressedButtonSprite;
-        
+
         audioSource.Play();
         yield return new WaitWhile(() => audioSource.isPlaying);
 

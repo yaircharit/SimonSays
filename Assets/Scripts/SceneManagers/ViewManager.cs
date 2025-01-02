@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -17,52 +18,58 @@ public class ViewManager : MonoBehaviour
     public float buttonsRadius = 2.7f;
     public AudioClip[] sounds;
     public Color[] buttonColors = { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan };
+    public static Color[] ButtonColors => Instance.buttonColors;
     public float defaultGameDelay = 0.8f;
-    public Button repeatButton;
-    public GameObject overlayWindowObject;
-    private OverlayWindow overlayWindow;
 
-    public TextMeshProUGUI scoreTextObject;
-    public TextMeshProUGUI timeTextObject;
-    public GameObject leaderboardWindow;
+    private Button repeatButton;
+    private OnExitOverlayWindow overlayWindow;
 
-    private static GameButton[] buttons;
-    private Coroutine playSeqenceCoroutine;
+    private TMP_Text scoreTextObject;
+    private TMP_Text timeTextObject;
+
+    private Transform buttonsContainer;
+    private GameButton[] buttons;
+    private Coroutine playSequenceCoroutine;
     private float GameDelay => defaultGameDelay / GlobalVariables.SelectedConfig.GameSpeed;
+
+    static ViewManager()
+    {
+        GameManager.OnScoreChanged += UpdateScore;
+        GameManager.OnTimeChanged += UpdateTime;
+        GameManager.OnGameEnded += HandleGameEnded;
+    }
 
     private void Awake()
     {
         Instance = this;
 
-        overlayWindow = overlayWindowObject.GetComponent<OverlayWindow>();
+        overlayWindow = transform.Find("OverlayWindow").GetComponent<OnExitOverlayWindow>();
+        scoreTextObject = gameObject.GetComponentsInChildren<TMP_Text>().Single(obj => obj.name == "ScoreText");
+        timeTextObject = gameObject.GetComponentsInChildren<TMP_Text>().Single(obj => obj.name == "TimerText");
+        repeatButton = gameObject.GetComponentsInChildren<Button>().Single(obj => obj.name == "RepeatButton");
+        buttonsContainer = transform.Find("ButtonsContainer").transform;
 
         // Apply selected config
-        repeatButton.gameObject.SetActive(!GlobalVariables.ChallengeMode);
+        repeatButton.gameObject.SetActive(!GlobalVariables.ChallengeMode);        
+
         SpawnButtons(GlobalVariables.SelectedConfig.GameButtons);
     }
 
-    /// <summary>
-    /// Update the time text
-    /// </summary>
-    /// <param name="time">Number of seconds left</param>
-    public void UpdateTime(int time)
+    public static void UpdateTime(int time)
     {
-        timeTextObject.text = $"Time Left: {time} seconds";
+        Instance.timeTextObject.text = $"Time Left: {time} seconds";
     }
 
-    /// <summary>
-    /// Update the score text
-    /// </summary>
-    /// <param name="score">New score</param>
-    public void UpdateScore(int score)
+    public static void UpdateScore(int score)
     {
-        scoreTextObject.text = $"Score: {GameManager.score}";
+        Instance.scoreTextObject.text = $"Score: {score}";
     }
 
-    /// <summary>
-    /// Spawn game buttons in a circle
-    /// </summary>
-    /// <param name="count">number of buttons to spawn</param>
+    private static void HandleGameEnded(bool gameWon)
+    {
+        SceneManager.LoadScene("Leaderboard");
+    }
+
     private void SpawnButtons(int count)
     {
         buttons = new GameButton[count];
@@ -74,25 +81,24 @@ public class ViewManager : MonoBehaviour
             float angle = i * angleStep * Mathf.Deg2Rad; // Convert angle to radians
             pos.x = Mathf.Cos(angle) * buttonsRadius;
             pos.y = Mathf.Sin(angle) * buttonsRadius;
-            buttons[i] = Instantiate(buttonPrefab, pos, Quaternion.identity, transform).GetComponent<GameButton>();
-            buttons[i].enabled = false;
+            buttons[i] = Instantiate(buttonPrefab, pos, Quaternion.identity, buttonsContainer).GetComponent<GameButton>();
         }
     }
 
     public static void EnableButtons(bool enable)
     {
         Instance.repeatButton.enabled = enable;
-        Array.ForEach(buttons, (butt) => butt.enabled = enable);
+        Array.ForEach(Instance.buttons, (butt) => butt.enabled = enable);
     }
 
     public void HandleRepeatButtonClick()
     {
-        if ( playSeqenceCoroutine != null )
+        if ( playSequenceCoroutine != null )
         {
-            StopCoroutine(playSeqenceCoroutine); // Stop previous sequence playing
+            StopCoroutine(playSequenceCoroutine); // Stop previous sequence playing
         }
 
-        playSeqenceCoroutine = StartCoroutine(PlaySequance()); // Start new sequence play
+        playSequenceCoroutine = StartCoroutine(PlaySequence()); // Start new sequence play
     }
 
     public void HandleExitButtonClick()
@@ -114,7 +120,7 @@ public class ViewManager : MonoBehaviour
     /// <summary>
     /// Plays the sequence of buttons. Disables buttons while playing
     /// </summary>
-    public IEnumerator PlaySequance()
+    public IEnumerator PlaySequence()
     {
         EnableButtons(false);
         yield return new WaitForSeconds(GameDelay * 1.5f); // Little pause before next round
@@ -122,19 +128,19 @@ public class ViewManager : MonoBehaviour
         if ( !GlobalVariables.SelectedConfig.RepeatMode )
         {
             // Play only the last button in sequence
-            yield return PlayButton(GameManager.sequence.Last());
+            yield return PlayButton(GameManager.Sequence.Last());
             EnableButtons(true);
             yield break;
         }
 
         // play sequance
-        foreach ( var butt in GameManager.sequence )
+        foreach ( var butt in GameManager.Sequence )
         {
             yield return PlayButton(butt);
         }
 
-        EnableButtons(!overlayWindow.IsActive); // What if the sequence is playing while overlay window is open? stay disabled
-        playSeqenceCoroutine = null; // Clear
+        EnableButtons(!overlayWindow.IsActive); // Keep disabled if overlay window is open
+        playSequenceCoroutine = null; // Clear
     }
 
     private IEnumerator PlayButton(int index)
