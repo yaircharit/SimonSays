@@ -1,8 +1,6 @@
-using Assets.Scripts;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Contains all of the game logic and behaviours.
