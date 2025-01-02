@@ -5,18 +5,24 @@ using UnityEngine;
 
 public class LeaderboardRepository
 {
-    private string databaseFileName;
-    private string tableName;
-    private SqliteConnection dbConnection;
+    private static LeaderboardRepository instance = new LeaderboardRepository();
+    public static LeaderboardRepository Instance => instance;
 
-    private string DatabasePath => Path.Combine(Application.streamingAssetsPath, databaseFileName);
+    private static string databaseFileName;
+    private static string tableName;
+    private static SqliteConnection dbConnection;
 
-    public LeaderboardRepository(string dbFileName, string tableName)
+    private static string DatabasePath => Path.Combine(Application.streamingAssetsPath, databaseFileName);
+
+    private LeaderboardRepository() { }
+
+    public static LeaderboardRepository Init(string dbFileName, string tableName)
     {
-        this.databaseFileName = dbFileName;
-        this.tableName = tableName;
-        LoadDatabase();
-        CreateTable();
+        LeaderboardRepository.databaseFileName = dbFileName;
+        LeaderboardRepository.tableName = tableName;
+        instance.LoadDatabase();
+        instance.CreateTable();
+        return instance;
     }
 
     private void LoadDatabase()
@@ -33,13 +39,13 @@ public class LeaderboardRepository
     private void CreateTable()
     {
         string createTableQuery = @$"
-                                    CREATE TABLE IF NOT EXISTS {tableName} (
-                                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                        PlayerName TEXT NOT NULL,
-                                        Score FLOAT NOT NULL,
-                                        Difficulty INTEGER NOT NULL,
-                                        Challenge BOOLEAN NOT NULL
-                                    )";
+                                            CREATE TABLE IF NOT EXISTS {tableName} (
+                                                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                PlayerName TEXT NOT NULL,
+                                                Score FLOAT NOT NULL,
+                                                Difficulty INTEGER NOT NULL,
+                                                Challenge BOOLEAN NOT NULL
+                                            )";
         using var command = new SqliteCommand(createTableQuery, dbConnection);
         command.ExecuteNonQuery();
     }

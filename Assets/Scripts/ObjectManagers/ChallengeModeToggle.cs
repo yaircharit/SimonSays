@@ -12,7 +12,13 @@ public class ChallengeModeToggle : MonoBehaviour
         new Color(255,200,0,255)  // Gold
     };
 
-    private static float[] gameSpeeds;
+    public Color[] checkmarkColors = {
+        new Color(255, 255, 255, 255), // White
+        new Color(255,200,0,255),  // Gold
+        new Color(160,160,160,255) // Silver
+    };
+
+    internal static float[] gameSpeeds;
 
     private Toggle toggle;
     public bool IsOn
@@ -49,6 +55,8 @@ public class ChallengeModeToggle : MonoBehaviour
 
     public int difficulty;
 
+    private ChallengeModeState currentState;
+
     private void Awake()
     {
         if ( gameSpeeds == null )
@@ -60,6 +68,8 @@ public class ChallengeModeToggle : MonoBehaviour
         label = gameObject.GetComponentInChildren<TMP_Text>();
         image = gameObject.GetComponentInChildren<Image>();
         checkmarkImage = gameObject.transform.Find("Background").GetChild(0).GetComponent<Image>();
+
+        currentState = new DisabledState(this);
     }
 
     /// <summary>
@@ -80,17 +90,54 @@ public class ChallengeModeToggle : MonoBehaviour
     {
         this.difficulty = difficulty;
         Color = difficultyColors[difficulty];
+        checkmarkColor = checkmarkColors[difficulty];
+
         if ( gameSpeeds[difficulty] == 1 )
         {
-            Text = ""; // Don't print text if it's x1...
-            toggle.isOn = toggle.interactable = false; //disable
+            currentState = new DisabledState(this);
         } else
         {
-            Text = $"x{gameSpeeds[difficulty]}"; // x1.5
-            checkmarkColor = difficultyColors[difficulty % 2 + 1]; // For silver trophy (Medium) set star to gold, For gold set it to silver TODO: handle this better
-            toggle.interactable = true;
+            currentState = new EnabledState(this);
         }
 
+        return currentState.Handle(difficulty);
+    }
+}
+
+public abstract class ChallengeModeState
+{
+    protected ChallengeModeToggle toggle;
+    public ChallengeModeState(ChallengeModeToggle toggle)
+    {
+        this.toggle = toggle;
+    }
+    public abstract bool Handle(int difficulty);
+}
+
+public class DisabledState : ChallengeModeState
+{
+    public DisabledState(ChallengeModeToggle toggle) : base(toggle)
+    {
+    }
+
+    public override bool Handle(int difficulty)
+    {
+        toggle.Text = ""; // Don't print text if it's disabled (x1)
+        toggle.IsOn = toggle.interactable = false; //disable
+        return toggle.interactable;
+    }
+}
+
+public class EnabledState : ChallengeModeState
+{
+    public EnabledState(ChallengeModeToggle toggle) :base(toggle)
+    {
+    }
+
+    public override bool Handle(int difficulty)
+    {
+        toggle.Text = $"x{ChallengeModeToggle.gameSpeeds[difficulty]}"; // x1.5 or x1.25 ...
+        toggle.interactable = true;
         return toggle.interactable;
     }
 }

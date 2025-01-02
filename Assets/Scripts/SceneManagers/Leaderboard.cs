@@ -40,7 +40,7 @@ public class Leaderboard : MonoBehaviour
     {
         if ( repository == null )
         {
-            repository = new LeaderboardRepository(dbFileName, tableName);
+            repository = LeaderboardRepository.Init(dbFileName, tableName);
             playerScores = repository.LoadScores();
         }
     }
@@ -96,7 +96,7 @@ public class Leaderboard : MonoBehaviour
 
     public void CloseWindow()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("GameSetup");
     }
 
     public void HightlightRow(PlayerScore playerScore)
