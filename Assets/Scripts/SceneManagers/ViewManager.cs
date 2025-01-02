@@ -30,7 +30,7 @@ public class ViewManager : MonoBehaviour
     private Transform buttonsContainer;
     private GameButton[] buttons;
     private Coroutine playSequenceCoroutine;
-    private float GameDelay => defaultGameDelay / GlobalVariables.SelectedConfig.GameSpeed;
+    private float GameDelay => defaultGameDelay / GameSetup.SelectedConfig.GameSpeed;
 
     static ViewManager()
     {
@@ -50,9 +50,9 @@ public class ViewManager : MonoBehaviour
         buttonsContainer = transform.Find("ButtonsContainer").transform;
 
         // Apply selected config
-        repeatButton.gameObject.SetActive(!GlobalVariables.ChallengeMode);        
+        repeatButton.gameObject.SetActive(!GameManager.ChallengeMode);        
 
-        SpawnButtons(GlobalVariables.SelectedConfig.GameButtons);
+        SpawnButtons(GameSetup.SelectedConfig.GameButtons);
     }
 
     public static void UpdateTime(int time)
@@ -60,7 +60,7 @@ public class ViewManager : MonoBehaviour
         Instance.timeTextObject.text = $"Time Left: {time} seconds";
     }
 
-    public static void UpdateScore(int score)
+    public static void UpdateScore(float score)
     {
         Instance.scoreTextObject.text = $"Score: {score}";
     }
@@ -111,7 +111,7 @@ public class ViewManager : MonoBehaviour
         if ( Input.GetKeyDown(KeyCode.Escape) )
         {
             HandleExitButtonClick();
-        } else if ( Input.GetKeyDown(KeyCode.Space) && !GlobalVariables.ChallengeMode )
+        } else if ( Input.GetKeyDown(KeyCode.Space) && !GameManager.ChallengeMode )
         {
             HandleRepeatButtonClick();
         }
@@ -125,7 +125,7 @@ public class ViewManager : MonoBehaviour
         EnableButtons(false);
         yield return new WaitForSeconds(GameDelay * 1.5f); // Little pause before next round
 
-        if ( !GlobalVariables.SelectedConfig.RepeatMode )
+        if ( !GameSetup.SelectedConfig.RepeatMode )
         {
             // Play only the last button in sequence
             yield return PlayButton(GameManager.Sequence.Last());

@@ -11,6 +11,44 @@ using UnityEngine.UI;
 /// </summary>
 public class SettingsWindow : MonoBehaviour
 {
+    #region PlayerPrefsAccess
+    // PlayerPrefs keys
+    private const string VolumeKey = "Volume";
+    private const string MuteKey = "Mute";
+    private const string ResolutionXKey = "ResolutionX";
+    private const string ResolutionYKey = "ResolutionY";
+    private const string FullscreenKey = "Fullscreen";
+
+    public static float Volume
+    {
+        get => PlayerPrefs.GetFloat(VolumeKey, 0.5f); // Default volume is 1.0 (100%)
+        set { PlayerPrefs.SetFloat(VolumeKey, value); }
+    }
+
+    public static bool Mute
+    {
+        get => PlayerPrefs.GetInt(MuteKey, 0) == 1; // Default is not muted
+        set { PlayerPrefs.SetInt(MuteKey, value ? 1 : 0); }
+    }
+
+    public static Vector2Int defaultResolution = new Vector2Int(1280, 720);
+    public static Resolution DefaultResolution => new Resolution() { width = defaultResolution.x, height = defaultResolution.y };
+    public static Resolution Resolution
+    {
+        get => new() { width = PlayerPrefs.GetInt(ResolutionXKey, DefaultResolution.width), height = PlayerPrefs.GetInt(ResolutionYKey, DefaultResolution.height) };
+        set {
+            PlayerPrefs.SetInt(ResolutionXKey, value.width);
+            PlayerPrefs.SetInt(ResolutionYKey, value.height);
+        }
+    }
+
+    public static bool Fullscreen
+    {
+        get => PlayerPrefs.GetInt(FullscreenKey, 1) == 1; // Default is fullscreen
+        set { PlayerPrefs.SetInt(FullscreenKey, value ? 1 : 0); }
+    }
+    #endregion PlayerPrefsAccess
+
     public Slider volumeSlider;
     public Toggle muteToggle;
     public TMP_Dropdown resolutionDropdown;
@@ -37,44 +75,43 @@ public class SettingsWindow : MonoBehaviour
         resolutionDropdown.RefreshShownValue();
 
         // Initialize based on previous settings
-        volumeSlider.value = GlobalVariables.Volume;
-        muteToggle.isOn = GlobalVariables.Mute;
-        fullscreenToggle.isOn = GlobalVariables.Fullscreen;
+        volumeSlider.value = Volume;
+        muteToggle.isOn = Mute;
+        fullscreenToggle.isOn = Fullscreen;
 
         // Update resolutionDropdown value after adding options
-        resolutionDropdown.value = System.Array.IndexOf(availableResolutions, availableResolutions.FirstOrDefault(r => r.width == GlobalVariables.Resolution.width && r.height == GlobalVariables.Resolution.height));
+        resolutionDropdown.value = System.Array.IndexOf(availableResolutions, availableResolutions.FirstOrDefault(r => r.width == Resolution.width && r.height == Resolution.height));
         resolutionDropdown.RefreshShownValue();
 
         // Save initial settings to revert back if needed
-        initialVolume = GlobalVariables.Volume;
-        initialMuteState = GlobalVariables.Mute;
-        initialResolution = GlobalVariables.Resolution;
-        initialFullscreenState = GlobalVariables.Fullscreen;
+        initialVolume = Volume;
+        initialMuteState = Mute;
+        initialResolution = Resolution;
+        initialFullscreenState = Fullscreen;
     }
 
     public void SetVolume()
     {
-        GlobalVariables.Volume = AudioListener.volume =  volumeSlider.value / volumeSlider.maxValue;
+        Volume = AudioListener.volume =  volumeSlider.value / volumeSlider.maxValue;
     }
 
     public void ToggleMute()
     {
-        GlobalVariables.Mute = muteToggle.isOn;
-        AudioListener.volume = GlobalVariables.Mute ? 0 : GlobalVariables.Volume;
-        muteToggle.GetComponentInChildren<TMP_Text>().text = GlobalVariables.Mute ? "Unmute" : "Mute";
-        volumeSlider.interactable = !GlobalVariables.Mute;
+        Mute = muteToggle.isOn;
+        AudioListener.volume = Mute ? 0 : Volume;
+        muteToggle.GetComponentInChildren<TMP_Text>().text = Mute ? "Unmute" : "Mute";
+        volumeSlider.interactable = !Mute;
     }
 
     public void SetResolution()
     {
-        GlobalVariables.Resolution = availableResolutions[resolutionDropdown.value];
-        Screen.SetResolution(GlobalVariables.Resolution.width, GlobalVariables.Resolution.height, Screen.fullScreen);
+        Resolution = availableResolutions[resolutionDropdown.value];
+        Screen.SetResolution(Resolution.width, Resolution.height, Screen.fullScreen);
     }
 
     public void ToggleFullscreen()
     {
-        GlobalVariables.Fullscreen = fullscreenToggle.isOn;
-        Screen.fullScreen = fullscreenToggle.isOn;
+        Screen.fullScreen = Fullscreen = fullscreenToggle.isOn;
     }
 
     /// <summary>
@@ -92,14 +129,14 @@ public class SettingsWindow : MonoBehaviour
     public void CancelSettings()
     {
         // Save initial state to GlobalVariables
-        GlobalVariables.Volume = initialVolume;
-        GlobalVariables.Mute = initialMuteState;
-        GlobalVariables.Resolution = initialResolution;
-        GlobalVariables.Fullscreen = initialFullscreenState;
+        Volume = initialVolume;
+        Mute = initialMuteState;
+        Resolution = initialResolution;
+        Fullscreen = initialFullscreenState;
 
         // Revert changes made
         AudioListener.volume = initialVolume;
-        GlobalVariables.Mute = initialMuteState;
+        Mute = initialMuteState;
         volumeSlider.value = initialVolume;
         muteToggle.isOn = initialMuteState;
         resolutionDropdown.value = System.Array.IndexOf(availableResolutions, availableResolutions
@@ -116,9 +153,8 @@ public class SettingsWindow : MonoBehaviour
     /// </summary>
     public static void LoadSettings()
     {
-        // GlobalVariables uses PlayerPrefs to save data between sessions
-        AudioListener.volume = GlobalVariables.Mute ? 0 : GlobalVariables.Volume;
-        Screen.SetResolution(GlobalVariables.Resolution.width, GlobalVariables.Resolution.height, Screen.fullScreen);
-        Screen.fullScreen = GlobalVariables.Fullscreen;
+        AudioListener.volume = Mute ? 0 : Volume;
+        Screen.SetResolution(Resolution.width, Resolution.height, Screen.fullScreen);
+        Screen.fullScreen = Fullscreen;
     }
 }

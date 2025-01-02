@@ -1,4 +1,7 @@
 using Assets.Scripts;
+using ConfigurationLoader;
+using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,13 +19,35 @@ public class GameSetup : MonoBehaviour
 
     private PlayerNameOverlayWindow overlayWindow;
 
+    private static string ConfigFileName { get; set; } = "config.json";
+    private static string ConfigPath => Path.Combine(Application.streamingAssetsPath, ConfigFileName);
+    public static List<AppConfig> Configs { get; set; }
+
+    public static AppConfig SelectedConfig { get; set; }
+    public static int SelectedConfigIndex => Configs.IndexOf(SelectedConfig);
+
+
+    // PlayerPrefs keys
+    private const string PlayerNameKey = "PlayerName";
+
+    public static string PlayerName
+    {
+        get => PlayerPrefs.GetString(PlayerNameKey, ""); // Keep the player's name in the PlayerPrefs, empty string if not set
+        set { PlayerPrefs.SetString(PlayerNameKey, value); }
+    }
+
+    public static void Init(string configFileName)
+    {
+        ConfigFileName = configFileName;
+        Configs ??= ConfigLoader<AppConfig>.LoadConfig(ConfigPath);
+    }
+
     void Awake()
     {
-        GlobalVariables.Init(); // ONLY FOR TESTING
         overlayWindow = overlayWindowObject.GetComponent<PlayerNameOverlayWindow>();
 
         // Initialize buttons for each config
-        foreach ( var cnf in GlobalVariables.Configs )
+        foreach ( var cnf in Configs )
         {
             Button tempButt = Instantiate(buttonPrefab, gameObject.transform).GetComponent<Button>();
             tempButt.GetComponentInChildren<TextMeshProUGUI>().text = cnf.Name;
@@ -32,7 +57,7 @@ public class GameSetup : MonoBehaviour
 
     public void OnButtonClick(AppConfig selectedConfig)
     {
-        GlobalVariables.SelectedConfig = selectedConfig;
+        SelectedConfig = selectedConfig;
 
         // Open player name input overlay window
         overlayWindow.OpenWindow();

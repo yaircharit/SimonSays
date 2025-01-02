@@ -25,9 +25,7 @@ public class Leaderboard : MonoBehaviour
 
     void Awake()
     {
-        GlobalVariables.Init();
-
-        if ( GlobalVariables.Score != -1 )
+        if ( GameManager.Score != -1 )
         {
             lastGame = SaveScore();
         }
@@ -38,11 +36,8 @@ public class Leaderboard : MonoBehaviour
 
     public static void Init(string dbFileName, string tableName)
     {
-        if ( repository == null )
-        {
-            repository = LeaderboardRepository.Init(dbFileName, tableName);
-            playerScores = repository.LoadScores();
-        }
+            repository ??= LeaderboardRepository.Init(dbFileName, tableName);
+            playerScores ??= repository.LoadScores();
     }
 
     private void DisplayScores()
@@ -66,12 +61,12 @@ public class Leaderboard : MonoBehaviour
             rows[score.Id] = row;
         }
 
-        if ( GlobalVariables.Score != -1 ) // If the last game is over (win/lose)
+        if ( GameManager.Score != -1 ) // If the last game is over (win/lose)
         {
-            titleTextObject.text = GlobalVariables.GameWon ? "Congratulations!" : "You Lost!";
+            titleTextObject.text = GameManager.GameWon ? "Congratulations!" : "You Lost!";
             // TODO: add sounds (win / lose)
             HightlightRow(lastGame);
-            GlobalVariables.Score = -1;
+            GameManager.Score = -1;
         }
     }
 
@@ -79,10 +74,10 @@ public class Leaderboard : MonoBehaviour
     {
         return SaveScore(new PlayerScore() {
             Id = playerScores.Count + 1,
-            PlayerName = GlobalVariables.PlayerName,
-            Score = GlobalVariables.Score,
-            Difficulty = GlobalVariables.SelectedConfigIndex,
-            Challenge = GlobalVariables.ChallengeMode
+            PlayerName = GameSetup.PlayerName,
+            Score = GameManager.Score,
+            Difficulty = GameSetup.SelectedConfigIndex,
+            Challenge = GameManager.ChallengeMode
         });
     }
 

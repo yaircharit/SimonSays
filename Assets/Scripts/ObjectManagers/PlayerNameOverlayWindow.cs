@@ -22,11 +22,11 @@ public class PlayerNameOverlayWindow : OverlayWindow
     protected override void OnOpen()
     {
         // Restore name and state from previous game
-        textInputField.text = GlobalVariables.PlayerName;
-        toggle.IsOn = GlobalVariables.ChallengeMode;
+        textInputField.text = GameSetup.PlayerName;
+        toggle.IsOn = GameManager.ChallengeMode;
 
         // Set the difficulty, text, and color to reflect the selected difficulty
-        toggle.SetDifficulty(GlobalVariables.SelectedConfigIndex); 
+        toggle.SetDifficulty(GameSetup.SelectedConfigIndex); 
     }
 
     public override void OnSubmit()
@@ -41,8 +41,8 @@ public class PlayerNameOverlayWindow : OverlayWindow
             return;
         }
 
-        GlobalVariables.ChallengeMode = toggle.IsOn && GlobalVariables.SelectedConfig.GameSpeed != 1; // not possible when game speed is 1
-        GlobalVariables.PlayerName = playerName;
+        GameManager.ChallengeMode = toggle.IsOn && GameSetup.SelectedConfig.GameSpeed != 1; // not possible when game speed is 1
+        GameSetup.PlayerName = playerName;
         SceneManager.LoadScene("GameScene");
     }
 }

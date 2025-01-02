@@ -1,17 +1,23 @@
 using Assets.Scripts;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    private static MainMenu instance;
     public string configFileName = "config.json";
     public string databaseFileName = "leaderboard.db";
     public string tableName = "Leaderboard";
 
-
-    private void Awake()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void OnApplicationLoad()
     {
-        GlobalVariables.Init(configFileName,databaseFileName,tableName);
+        instance = new GameObject("OnApplicationLoadHelper").AddComponent<MainMenu>();
+
+        GameSetup.Init(instance.configFileName);
+        Leaderboard.Init(instance.databaseFileName, instance.tableName);
+        SettingsWindow.LoadSettings();
     }
 
     public void OnPlayButtonClick()

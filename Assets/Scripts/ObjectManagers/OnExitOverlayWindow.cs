@@ -15,6 +15,7 @@ public class OnExitOverlayWindow : OverlayWindow
 
     public override void OnSubmit()
     {
+        GameManager.Score = -1;
         SceneManager.LoadScene("GameSetup");
     }
 

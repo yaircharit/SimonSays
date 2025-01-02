@@ -9,16 +9,16 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
-
     public static bool IsRunning { get; private set; } = false;
-    public static int Score { get; private set; } = 0;
+    public static float Score { get; set; } = 0;
     public static float TimeRemaining { get; private set; } = 999;
+    public static bool GameWon { get; private set; } = false;
+    public static bool ChallengeMode { get; set; } = false;
 
     public static List<int> Sequence { get; private set; } = new List<int>();
     public static int SequenceIndex { get; private set; } = 0;
 
-    public static event Action<int> OnScoreChanged;
+    public static event Action<float> OnScoreChanged;
     public static event Action<int> OnTimeChanged;
     public static event Action<bool> OnGameEnded;
 
@@ -31,8 +31,6 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
-
         InitializeGame();
     }
 
@@ -41,10 +39,10 @@ public class GameManager : MonoBehaviour
         Sequence.Clear();
         SequenceIndex = 0;
         Score = 0;
-        TimeRemaining = GlobalVariables.SelectedConfig.GameTime;
-        if ( GlobalVariables.ChallengeMode )
+        TimeRemaining = GameSetup.SelectedConfig.GameTime;
+        if ( ChallengeMode )
         {
-            Time.timeScale = GlobalVariables.SelectedConfig.GameSpeed; // Set game speed if challenge mode was selected
+            Time.timeScale = GameSetup.SelectedConfig.GameSpeed; // Set game speed if challenge mode was selected
         }
 
         IsRunning = true;
@@ -77,7 +75,7 @@ public class GameManager : MonoBehaviour
     private static void NextRound()
     {
         ViewManager.EnableButtons(false);   // Disable buttons so user can't change the sequence while playing
-        Sequence.Add(rand.Next(GlobalVariables.SelectedConfig.GameButtons));    // Get the next buttons of the sequence
+        Sequence.Add(rand.Next(GameSetup.SelectedConfig.GameButtons));    // Get the next buttons of the sequence
         ViewManager.Instance.HandleRepeatButtonClick();
     }
 
@@ -95,7 +93,7 @@ public class GameManager : MonoBehaviour
             {
                 // All sequence pressed correctly
 
-                Score += GlobalVariables.SelectedConfig.PointsEachStep;
+                Score += GameSetup.SelectedConfig.PointsEachStep;
                 OnScoreChanged?.Invoke(Score);
                 SequenceIndex = 0;
                 NextRound();
@@ -113,8 +111,8 @@ public class GameManager : MonoBehaviour
     /// <param name="gameWon">true if the game was won; false if lost</param>
     public static void EndGame(bool gameWon)
     {
-        GlobalVariables.Score = Score * (GlobalVariables.ChallengeMode ? GlobalVariables.SelectedConfig.GameSpeed : 1);
-        GlobalVariables.GameWon = gameWon;
+        Score = Score * (ChallengeMode ? GameSetup.SelectedConfig.GameSpeed : 1);
+        GameWon = gameWon;
         Time.timeScale = 1; // back to normal
         OnGameEnded?.Invoke(gameWon);
     }
