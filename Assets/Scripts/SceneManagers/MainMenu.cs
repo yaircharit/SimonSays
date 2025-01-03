@@ -3,19 +3,19 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    private static MainMenu instance;
-    public string configFileName = "config.json";
-    public string databaseFileName = "leaderboard.db";
-    public string tableName = "Leaderboard";
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void OnApplicationLoad()
     {
-        instance = new GameObject("OnApplicationLoadHelper").AddComponent<MainMenu>();
+        var helperObject = new GameObject("OnApplicationLoadHelper",
+            new System.Type[]{
+                typeof(GameSetup), // Load config
+                typeof(Leaderboard) // Load database
+            }
+        );
 
-        GameSetup.Init(instance.configFileName);
-        Leaderboard.Init(instance.databaseFileName, instance.tableName);
         SettingsWindow.LoadSettings();
+
+        Destroy(helperObject.gameObject);
     }
 
     public void OnPlayButtonClick()

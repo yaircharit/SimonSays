@@ -23,7 +23,7 @@ public class PlayerNameOverlayWindow : OverlayWindow
     {
         // Restore name and state from previous game
         textInputField.text = GameSetup.PlayerName;
-        toggle.IsOn = GameManager.ChallengeMode;
+        toggle.IsOn = GameSetup.ChallengeMode;
 
         // Set the difficulty, text, and color to reflect the selected difficulty
         toggle.SetDifficulty(GameSetup.SelectedConfigIndex); 
@@ -41,7 +41,7 @@ public class PlayerNameOverlayWindow : OverlayWindow
             return;
         }
 
-        GameManager.ChallengeMode = toggle.IsOn && GameSetup.SelectedConfig.GameSpeed != 1; // not possible when game speed is 1
+        GameSetup.ChallengeMode = toggle.IsOn && GameSetup.SelectedConfig.GameSpeed != 1; // not possible when game speed is 1
         GameSetup.PlayerName = playerName;
         SceneManager.LoadScene("GameScene");
     }

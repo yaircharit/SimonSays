@@ -5,28 +5,18 @@ using UnityEngine;
 
 public class LeaderboardRepository
 {
-    private static LeaderboardRepository instance = new LeaderboardRepository();
-    public static LeaderboardRepository Instance => instance;
+    private string tableName;
+    private SqliteConnection dbConnection;
 
-    private static string databaseFileName;
-    private static string tableName;
-    private static SqliteConnection dbConnection;
-
-    private static string DatabasePath => Path.Combine(Application.streamingAssetsPath, databaseFileName);
-
-    private LeaderboardRepository() { }
-
-    public static LeaderboardRepository Init(string dbFileName, string tableName)
+    public LeaderboardRepository(string dbFileName, string tableName) 
     {
-        LeaderboardRepository.databaseFileName = dbFileName;
-        LeaderboardRepository.tableName = tableName;
-        instance.LoadDatabase();
-        instance.CreateTable();
-        return instance;
+        LoadDatabase(dbFileName);
+        CreateTable(tableName);
     }
 
-    private void LoadDatabase()
+    private void LoadDatabase(string dbFileName)
     {
+        string DatabasePath = Path.Combine(Application.streamingAssetsPath, dbFileName);
         if ( !File.Exists(DatabasePath) )
         {
             File.Create(DatabasePath);
@@ -36,8 +26,9 @@ public class LeaderboardRepository
         dbConnection.Open();
     }
 
-    private void CreateTable()
+    private void CreateTable(string tableName)
     {
+        this.tableName = tableName;
         string createTableQuery = @$"
                                             CREATE TABLE IF NOT EXISTS {tableName} (
                                                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,13 +50,13 @@ public class LeaderboardRepository
             {
                 while ( reader.Read() )
                 {
-                    scores.Add(new PlayerScore {
-                        Id = reader.GetInt32(0),
-                        PlayerName = reader.GetString(1),
-                        Score = reader.GetFloat(2),
-                        Difficulty = reader.GetInt32(3),
-                        Challenge = reader.GetBoolean(4)
-                    });
+                    scores.Add(new PlayerScore (
+                        id : reader.GetInt32(0),
+                        name : reader.GetString(1),
+                        score : reader.GetFloat(2),
+                        difficulty: reader.GetInt32(3),
+                        challengeMode: reader.GetBoolean(4)
+                    ));
                 }
             }
         }

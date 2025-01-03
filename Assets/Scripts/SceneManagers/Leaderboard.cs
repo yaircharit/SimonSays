@@ -10,32 +10,44 @@ using UnityEngine.UI;
 // Can also be a generic and abstract class but theres no real need for that (Leaderboard<PlayerScore> : Table<T> : OverlayWindwo (even less neccessary) : MonoBehaviour)
 public class Leaderboard : MonoBehaviour
 {
+    public string databaseFileName = "leaderboard.db";
+    public string tableName = "Leaderboard";
     public GameObject rowPrefab;
-    public TMP_Text titleTextObject;
     public GameObject rowsContainer;
     public Color hightlightColor = Color.yellow;
 
+    private TMP_Text titleTextObject;
     private static List<PlayerScore> playerScores;
     private Dictionary<int, GameObject> rows;
-    private PlayerScore lastGame;
+    public static PlayerScore lastGame;
     private static LeaderboardRepository repository;
+    public static int Count => playerScores.Count;
+    private string nextScene = "GameSetup";
 
     void Awake()
     {
-        if ( GameManager.Score != -1 )
+        // Initialize the repository and load the scores
+        repository ??= new LeaderboardRepository(databaseFileName, tableName);
+        playerScores ??= repository.LoadScores();
+    }
+
+    private void Start()
+    {
+        titleTextObject = transform.Find("WindowTitle").GetComponent<TMP_Text>();
+
+        if ( lastGame != null )
         {
-            lastGame = SaveScore();
+            SaveScore(lastGame);
+            nextScene = "GameSetup";
+        } else
+        {
+            nextScene = "MainMenu";
         }
 
         rows = new();
         DisplayScores();
     }
 
-    public static void Init(string dbFileName, string tableName)
-    {
-            repository ??= LeaderboardRepository.Init(dbFileName, tableName);
-            playerScores ??= repository.LoadScores();
-    }
 
     private void DisplayScores()
     {
@@ -58,24 +70,13 @@ public class Leaderboard : MonoBehaviour
             rows[score.Id] = row;
         }
 
-        if ( GameManager.Score != -1 ) // If the last game is over (win/lose)
+        if ( lastGame != null ) // If the last game is over (win/lose)
         {
-            titleTextObject.text = GameManager.GameWon ? "Congratulations!" : "You Lost!";
+            titleTextObject.text = lastGame.gameWon ? "Congratulations!" : "You Lost!";
             // TODO: add sounds (win / lose)
             HightlightRow(lastGame);
-            GameManager.Score = -1;
+            lastGame = null;
         }
-    }
-
-    public PlayerScore SaveScore()
-    {
-        return SaveScore(new PlayerScore() {
-            Id = playerScores.Count + 1,
-            PlayerName = GameSetup.PlayerName,
-            Score = GameManager.Score,
-            Difficulty = GameSetup.SelectedConfigIndex,
-            Challenge = GameManager.ChallengeMode
-        });
     }
 
     private PlayerScore SaveScore(PlayerScore newScore)
@@ -88,7 +89,7 @@ public class Leaderboard : MonoBehaviour
 
     public void CloseWindow()
     {
-        SceneManager.LoadScene("GameSetup");
+        SceneManager.LoadScene(nextScene);
     }
 
     public void HightlightRow(PlayerScore playerScore)
@@ -123,6 +124,26 @@ public class PlayerScore
     public float Score { get; set; }
     public int Difficulty { get; set; }
     public bool Challenge { get; set; }
+    [System.NonSerialized]
+    public bool gameWon;
+
+    public PlayerScore()
+    {
+        Id = Leaderboard.Count + 1;
+        PlayerName = GameSetup.PlayerName;
+        Score = 0;
+        Difficulty = GameSetup.SelectedConfigIndex;
+        Challenge = GameSetup.ChallengeMode;
+    }
+
+    public PlayerScore(int id, string name, float score, int difficulty, bool challengeMode)
+    {
+        Id = id;
+        PlayerName = name;
+        Score = score;
+        Difficulty = difficulty;
+        Challenge = challengeMode;
+    }
 
     public override string ToString()
     {

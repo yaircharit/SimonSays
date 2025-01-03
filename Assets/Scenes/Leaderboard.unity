@@ -342,7 +342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.6301887, g: 0.6301887, b: 0.6301887, a: 0.3647059}
+  m_Color: {r: 0.45882353, g: 0, b: 0.41568628, a: 0.78431374}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -695,12 +695,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 670947503}
+  - component: {fileID: 670947504}
   - component: {fileID: 670947502}
   - component: {fileID: 670947501}
   - component: {fileID: 670947500}
   - component: {fileID: 670947499}
   - component: {fileID: 670947498}
-  - component: {fileID: 670947504}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -843,8 +843,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ab8a3597228131439bd861c7904ed8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  databaseFileName: leaderboard.db
+  tableName: Leaderboard
   rowPrefab: {fileID: 6913367886383573910, guid: 9ca8eda50a3968942ac6f2d4c0907ba1, type: 3}
-  titleTextObject: {fileID: 1318327504}
   rowsContainer: {fileID: 314502706}
   hightlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &962587174
@@ -1090,6 +1091,14 @@ PrefabInstance:
     - target: {fileID: 828585420833251536, guid: 9ca8eda50a3968942ac6f2d4c0907ba1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 842729817879264299, guid: 9ca8eda50a3968942ac6f2d4c0907ba1, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 842729817879264299, guid: 9ca8eda50a3968942ac6f2d4c0907ba1, type: 3}
+      propertyPath: m_Color.g
+      value: 0.78431374
       objectReference: {fileID: 0}
     - target: {fileID: 1034467865689859656, guid: 9ca8eda50a3968942ac6f2d4c0907ba1, type: 3}
       propertyPath: m_fontSize
@@ -1702,8 +1711,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Leaderboard
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1727,7 +1736,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 94
+  m_fontSize: 89.5
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

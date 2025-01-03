@@ -13,46 +13,53 @@ using UnityEngine.UI;
 /// </summary>
 public class GameSetup : MonoBehaviour
 {
-    
+    public string configFileName = "config.json";
     public GameObject buttonPrefab;
-    public GameObject overlayWindowObject;
 
     private PlayerNameOverlayWindow overlayWindow;
+    private Transform buttonsContainer;
 
-    private static string ConfigFileName { get; set; } = "config.json";
-    private static string ConfigPath => Path.Combine(Application.streamingAssetsPath, ConfigFileName);
+    #region GlobalVars
     public static List<AppConfig> Configs { get; set; }
-
     public static AppConfig SelectedConfig { get; set; }
     public static int SelectedConfigIndex => Configs.IndexOf(SelectedConfig);
 
-
     // PlayerPrefs keys
     private const string PlayerNameKey = "PlayerName";
+    private const string ChallengeModeKey = "ChallengeMode";
 
     public static string PlayerName
     {
         get => PlayerPrefs.GetString(PlayerNameKey, ""); // Keep the player's name in the PlayerPrefs, empty string if not set
         set { PlayerPrefs.SetString(PlayerNameKey, value); }
     }
-
-    public static void Init(string configFileName)
+    public static bool ChallengeMode
     {
-        ConfigFileName = configFileName;
-        Configs ??= ConfigLoader<AppConfig>.LoadConfig(ConfigPath);
+        get => PlayerPrefs.GetInt(ChallengeModeKey, 0) == 1 ? true : false;
+        set { PlayerPrefs.SetInt(ChallengeModeKey, value ? 1 : 0); }
+    }
+    #endregion GlobalVars
+
+
+
+    private void Awake()
+    {
+        Configs ??= ConfigLoader<AppConfig>.LoadConfig(Path.Combine(Application.streamingAssetsPath, configFileName));
     }
 
-    void Awake()
+    void Start()
     {
-        overlayWindow = overlayWindowObject.GetComponent<PlayerNameOverlayWindow>();
+        overlayWindow = transform.Find("OverlayWindow").GetComponent<PlayerNameOverlayWindow>();
+        buttonsContainer = transform.Find("Container").Find("ButtonsContainer");
 
         // Initialize buttons for each config
         foreach ( var cnf in Configs )
         {
-            Button tempButt = Instantiate(buttonPrefab, gameObject.transform).GetComponent<Button>();
+            Button tempButt = Instantiate(buttonPrefab, buttonsContainer).GetComponent<Button>();
             tempButt.GetComponentInChildren<TextMeshProUGUI>().text = cnf.Name;
             tempButt.onClick.AddListener(() => OnButtonClick(cnf));
         }
+
     }
 
     public void OnButtonClick(AppConfig selectedConfig)

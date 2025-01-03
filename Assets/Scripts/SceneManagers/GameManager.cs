@@ -7,12 +7,9 @@ using UnityEngine;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-    public static bool IsRunning { get; private set; } = false;
-    public static float Score { get; set; } = 0;
-    public static float TimeRemaining { get; private set; } = 999;
-    public static bool GameWon { get; private set; } = false;
-    public static bool ChallengeMode { get; set; } = false;
+    private static float TimeRemaining { get; set; } = 999;
 
+    public static PlayerScore currentGame { get; set; }
     public static List<int> Sequence { get; private set; } = new List<int>();
     public static int SequenceIndex { get; private set; } = 0;
 
@@ -29,21 +26,14 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        InitializeGame();
-    }
-
-    private void InitializeGame()
-    {
         Sequence.Clear();
         SequenceIndex = 0;
-        Score = 0;
+        currentGame = new PlayerScore();
         TimeRemaining = GameSetup.SelectedConfig.GameTime;
-        if ( ChallengeMode )
+        if ( currentGame.Challenge )
         {
             Time.timeScale = GameSetup.SelectedConfig.GameSpeed; // Set game speed if challenge mode was selected
         }
-
-        IsRunning = true;
     }
 
     private void Start()
@@ -53,17 +43,14 @@ public class GameManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if ( IsRunning )
+        if ( TimeRemaining > 0 )
         {
-            if ( TimeRemaining > 0 )
-            {
-                TimeRemaining -= Time.deltaTime;
-                OnTimeChanged?.Invoke((int)TimeRemaining);
-            } else
-            {
-                // Game won!
-                EndGame(true);
-            }
+            TimeRemaining -= Time.deltaTime;
+            OnTimeChanged?.Invoke((int)TimeRemaining);
+        } else
+        {
+            // Game won!
+            EndGame(true);
         }
     }
 
@@ -91,8 +78,8 @@ public class GameManager : MonoBehaviour
             {
                 // All sequence pressed correctly
 
-                Score += GameSetup.SelectedConfig.PointsEachStep;
-                OnScoreChanged?.Invoke(Score);
+                currentGame.Score += GameSetup.SelectedConfig.PointsEachStep;
+                OnScoreChanged?.Invoke(currentGame.Score);
                 SequenceIndex = 0;
                 NextRound();
             }
@@ -109,8 +96,11 @@ public class GameManager : MonoBehaviour
     /// <param name="gameWon">true if the game was won; false if lost</param>
     public static void EndGame(bool gameWon)
     {
-        Score = Score * (ChallengeMode ? GameSetup.SelectedConfig.GameSpeed : 1);
-        GameWon = gameWon;
+        currentGame.Score *= (currentGame.Challenge ? GameSetup.SelectedConfig.GameSpeed : 1);
+        currentGame.gameWon = gameWon;
+        Leaderboard.lastGame = currentGame;
+        currentGame = null;
+
         Time.timeScale = 1; // back to normal
         OnGameEnded?.Invoke(gameWon);
     }

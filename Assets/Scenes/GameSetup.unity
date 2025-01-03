@@ -414,7 +414,6 @@ GameObject:
   - component: {fileID: 716009281}
   - component: {fileID: 716009283}
   - component: {fileID: 716009282}
-  - component: {fileID: 716009284}
   m_Layer: 5
   m_Name: ButtonsContainer
   m_TagString: Untagged
@@ -481,20 +480,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 2
---- !u!114 &716009284
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 716009280}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ebcce506f6ad344dae36f0d7d901a3f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buttonPrefab: {fileID: 3242793917371196675, guid: 96a9b994401f2ca4fbc80e22ea1a3728, type: 3}
-  overlayWindowObject: {fileID: 1905308380}
 --- !u!224 &767403913 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8810182926508017329, guid: bca3cf0cf5923354a94252f7f41a3bfd, type: 3}
@@ -564,8 +549,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Choose Difficulty
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -657,7 +642,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3242793917371196675, guid: 96a9b994401f2ca4fbc80e22ea1a3728, type: 3}
       propertyPath: m_Name
-      value: DifficultyButton
+      value: BackButton
       objectReference: {fileID: 0}
     - target: {fileID: 5282074230579534937, guid: 96a9b994401f2ca4fbc80e22ea1a3728, type: 3}
       propertyPath: m_Colors.m_NormalColor.a
@@ -722,7 +707,7 @@ PrefabInstance:
     - target: {fileID: 5282074230579534937, guid: 96a9b994401f2ca4fbc80e22ea1a3728, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 716009284}
+      objectReference: {fileID: 2034208691}
     - target: {fileID: 5282074230579534937, guid: 96a9b994401f2ca4fbc80e22ea1a3728, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -1347,6 +1332,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2034208688}
+  - component: {fileID: 2034208691}
   - component: {fileID: 2034208687}
   - component: {fileID: 2034208686}
   - component: {fileID: 2034208685}
@@ -1482,6 +1468,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2034208684}
   m_CullTransparentMesh: 1
+--- !u!114 &2034208691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2034208684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ebcce506f6ad344dae36f0d7d901a3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  configFileName: config.json
+  buttonPrefab: {fileID: 3242793917371196675, guid: 96a9b994401f2ca4fbc80e22ea1a3728, type: 3}
 --- !u!1 &2076601265
 GameObject:
   m_ObjectHideFlags: 0

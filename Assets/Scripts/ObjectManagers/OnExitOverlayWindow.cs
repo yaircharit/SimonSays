@@ -1,21 +1,26 @@
 using Assets.Scripts;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class OnExitOverlayWindow : OverlayWindow
 {
+    private float timeScale;
     protected override void OnClose()
     {
-        ViewManager.EnableButtons(true);
+        Time.timeScale = timeScale; // Resume game
     }
 
     protected override void OnOpen()
     {
-        ViewManager.EnableButtons(false);
+        timeScale = Time.timeScale;
+        Time.timeScale = 0; // Pause game
     }
 
     public override void OnSubmit()
     {
-        GameManager.Score = -1;
+        // Exit Game
+        GameManager.currentGame = null;
+        Time.timeScale = 1; 
         SceneManager.LoadScene("GameSetup");
     }
 

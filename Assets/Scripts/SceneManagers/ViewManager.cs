@@ -49,7 +49,7 @@ public class ViewManager : MonoBehaviour
         buttonsContainer = transform.Find("ButtonsContainer").transform;
 
         // Apply selected config
-        repeatButton.gameObject.SetActive(!GameManager.ChallengeMode);        
+        repeatButton.gameObject.SetActive(!GameManager.currentGame.Challenge);        
 
         SpawnButtons(GameSetup.SelectedConfig.GameButtons);
     }
@@ -110,7 +110,7 @@ public class ViewManager : MonoBehaviour
         if ( Input.GetKeyDown(KeyCode.Escape) )
         {
             HandleExitButtonClick();
-        } else if ( Input.GetKeyDown(KeyCode.Space) && !GameManager.ChallengeMode )
+        } else if ( Input.GetKeyDown(KeyCode.Space) && !GameManager.currentGame.Challenge )
         {
             HandleRepeatButtonClick();
         }

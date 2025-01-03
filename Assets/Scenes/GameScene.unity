@@ -615,7 +615,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7265128489056124604, guid: bca3cf0cf5923354a94252f7f41a3bfd, type: 3}
       propertyPath: m_BlockingObjects
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7324616866677436594, guid: bca3cf0cf5923354a94252f7f41a3bfd, type: 3}
       propertyPath: m_AnchorMax.y
@@ -797,8 +797,7 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 230
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 6916577277682700699, guid: bca3cf0cf5923354a94252f7f41a3bfd, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -1393,12 +1392,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1880543377}
   - component: {fileID: 1880543380}
+  - component: {fileID: 1880543385}
+  - component: {fileID: 1880543384}
   - component: {fileID: 1880543379}
   - component: {fileID: 1880543378}
   - component: {fileID: 1880543383}
   - component: {fileID: 1880543382}
-  - component: {fileID: 1880543385}
-  - component: {fileID: 1880543384}
   m_Layer: 5
   m_Name: Gameboard
   m_TagString: Untagged
