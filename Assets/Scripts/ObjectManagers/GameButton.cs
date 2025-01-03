@@ -30,7 +30,7 @@ public class GameButton : MonoBehaviour
 
         // Set audioclip
         audioSource = GetComponent<AudioSource>();
-        audioSource.clip = GetComponentInParent<ViewManager>().sounds[index];
+        audioSource.clip = ViewManager.Sounds[index];
 
         enabled = false; //disable until the game starts
     }

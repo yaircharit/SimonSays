@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Contains all of the game logic and behaviours.
@@ -15,7 +16,6 @@ public class GameManager : MonoBehaviour
 
     public static event Action<float> OnScoreChanged;
     public static event Action<int> OnTimeChanged;
-    public static event Action<bool> OnGameEnded;
 
     private static readonly System.Random rand = new System.Random();
 
@@ -59,7 +59,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private static void NextRound()
     {
-        ViewManager.EnableButtons(false);   // Disable buttons so user can't change the sequence while playing
         Sequence.Add(rand.Next(GameSetup.SelectedConfig.GameButtons));    // Get the next buttons of the sequence
         ViewManager.Instance.HandleRepeatButtonClick();
     }
@@ -102,6 +101,6 @@ public class GameManager : MonoBehaviour
         currentGame = null;
 
         Time.timeScale = 1; // back to normal
-        OnGameEnded?.Invoke(gameWon);
+        SceneManager.LoadScene("Leaderboard");
     }
 }

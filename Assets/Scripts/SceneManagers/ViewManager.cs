@@ -16,6 +16,7 @@ public class ViewManager : MonoBehaviour
     public GameObject buttonPrefab;
     public float buttonsRadius = 2.7f;
     public AudioClip[] sounds;
+    public static AudioClip[] Sounds => Instance.sounds;
     public Color[] buttonColors = { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan };
     public static Color[] ButtonColors => Instance.buttonColors;
     public float defaultGameDelay = 0.8f;
@@ -35,7 +36,6 @@ public class ViewManager : MonoBehaviour
     {
         GameManager.OnScoreChanged += UpdateScore;
         GameManager.OnTimeChanged += UpdateTime;
-        GameManager.OnGameEnded += HandleGameEnded;
     }
 
     private void Awake()
@@ -64,11 +64,6 @@ public class ViewManager : MonoBehaviour
         Instance.scoreTextObject.text = $"Score: {score}";
     }
 
-    private static void HandleGameEnded(bool gameWon)
-    {
-        SceneManager.LoadScene("Leaderboard");
-    }
-
     private void SpawnButtons(int count)
     {
         buttons = new GameButton[count];
@@ -84,10 +79,10 @@ public class ViewManager : MonoBehaviour
         }
     }
 
-    public static void EnableButtons(bool enable)
+    public void EnableButtons(bool enable)
     {
-        Instance.repeatButton.enabled = enable;
-        Array.ForEach(Instance.buttons, (butt) => butt.enabled = enable);
+        repeatButton.enabled = enable;
+        Array.ForEach(buttons, (butt) => butt.enabled = enable);
     }
 
     public void HandleRepeatButtonClick()
