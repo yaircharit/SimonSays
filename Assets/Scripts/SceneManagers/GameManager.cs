@@ -6,25 +6,21 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// Contains all of the game logic and behaviours.
 /// </summary>
-public class GameManager : MonoBehaviour
+public class GameManager
 {
-    private static float TimeRemaining { get; set; } = 999;
+    private float TimeRemaining { get; set; } = 999;
 
     public static PlayerScore currentGame { get; set; }
-    public static List<int> Sequence { get; private set; } = new List<int>();
-    public static int SequenceIndex { get; private set; } = 0;
+    public List<int> Sequence { get; private set; } = new List<int>();
+    public int SequenceIndex { get; private set; } = 0;
 
     public static event Action<float> OnScoreChanged;
     public static event Action<int> OnTimeChanged;
 
-    private static readonly System.Random rand = new System.Random();
+    private readonly System.Random rand = new System.Random();
 
-    static GameManager()
-    {
-        GameButton.OnButtonPress += CheckSequence;
-    }
 
-    private void Awake()
+    public void Init()
     {
         Sequence.Clear();
         SequenceIndex = 0;
@@ -36,12 +32,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        NextRound();
-    }
 
-    private void FixedUpdate()
+    public void UpdateGame()
     {
         if ( TimeRemaining > 0 )
         {
@@ -57,17 +49,17 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Adds a new step to the sequence and plays it
     /// </summary>
-    private static void NextRound()
+    public void NextRound()
     {
         Sequence.Add(rand.Next(GameSetup.SelectedConfig.GameButtons));    // Get the next buttons of the sequence
-        ViewManager.Instance.HandleRepeatButtonClick();
+        SimonSays.Instance.HandleRepeatButtonClick();
     }
 
     /// <summary>
     /// Checks if the index is the next one in the sequence
     /// </summary>
     /// <param name="index">button index</param>
-    public static void CheckSequence(int index)
+    public void CheckSequence(int index)
     {
         if ( Sequence[SequenceIndex++] == index )
         {
@@ -93,7 +85,7 @@ public class GameManager : MonoBehaviour
     /// Ends the game and moves to Leaderboard scene
     /// </summary>
     /// <param name="gameWon">true if the game was won; false if lost</param>
-    public static void EndGame(bool gameWon)
+    public void EndGame(bool gameWon)
     {
         currentGame.Score *= (currentGame.Challenge ? GameSetup.SelectedConfig.GameSpeed : 1);
         currentGame.gameWon = gameWon;

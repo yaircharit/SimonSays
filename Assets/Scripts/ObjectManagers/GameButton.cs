@@ -26,11 +26,11 @@ public class GameButton : MonoBehaviour
 
         // Set color
         spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.color = ViewManager.ButtonColors[index];
+        spriteRenderer.color = SimonSays.ButtonColors[index];
 
         // Set audioclip
         audioSource = GetComponent<AudioSource>();
-        audioSource.clip = ViewManager.Sounds[index];
+        audioSource.clip = SimonSays.Sounds[index];
 
         enabled = false; //disable until the game starts
     }

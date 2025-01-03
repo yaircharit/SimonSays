@@ -9,9 +9,9 @@ using UnityEngine.UI;
 /// <summary>
 /// Handles all the visualization of in the GameScene. 
 /// </summary>
-public class ViewManager : MonoBehaviour
+public class SimonSays : MonoBehaviour
 {
-    public static ViewManager Instance { get; private set; }
+    public static SimonSays Instance { get; private set; }
 
     public GameObject buttonPrefab;
     public float buttonsRadius = 2.7f;
@@ -30,17 +30,22 @@ public class ViewManager : MonoBehaviour
     private Transform buttonsContainer;
     private GameButton[] buttons;
     private Coroutine playSequenceCoroutine;
-    private float GameDelay => defaultGameDelay / GameSetup.SelectedConfig.GameSpeed;
+    private static float GameDelay => Instance.defaultGameDelay / GameSetup.SelectedConfig.GameSpeed;
+    private static GameManager gameManager;
 
-    static ViewManager()
+    static SimonSays()
     {
         GameManager.OnScoreChanged += UpdateScore;
         GameManager.OnTimeChanged += UpdateTime;
+        gameManager = new GameManager();
+        GameButton.OnButtonPress += gameManager.CheckSequence;
     }
 
     private void Awake()
     {
         Instance = this;
+
+        gameManager.Init();
 
         overlayWindow = transform.Find("OverlayWindow").GetComponent<OnExitOverlayWindow>();
         scoreTextObject = gameObject.GetComponentsInChildren<TMP_Text>().Single(obj => obj.name == "ScoreText");
@@ -52,6 +57,27 @@ public class ViewManager : MonoBehaviour
         repeatButton.gameObject.SetActive(!GameManager.currentGame.Challenge);        
 
         SpawnButtons(GameSetup.SelectedConfig.GameButtons);
+    }
+
+    private void Start()
+    {
+        gameManager.NextRound();
+    }
+
+    private void Update()
+    {
+        if ( Input.GetKeyDown(KeyCode.Escape) )
+        {
+            HandleExitButtonClick();
+        } else if ( Input.GetKeyDown(KeyCode.Space) && !GameManager.currentGame.Challenge )
+        {
+            HandleRepeatButtonClick();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        gameManager.UpdateGame();
     }
 
     public static void UpdateTime(int time)
@@ -87,12 +113,12 @@ public class ViewManager : MonoBehaviour
 
     public void HandleRepeatButtonClick()
     {
-        if ( playSequenceCoroutine != null )
+        if ( Instance.playSequenceCoroutine != null )
         {
-            StopCoroutine(playSequenceCoroutine); // Stop previous sequence playing
+            Instance.StopCoroutine(Instance.playSequenceCoroutine); // Stop previous sequence playing
         }
 
-        playSequenceCoroutine = StartCoroutine(PlaySequence()); // Start new sequence play
+        Instance.playSequenceCoroutine = Instance.StartCoroutine(PlaySequence()); // Start new sequence play
     }
 
     public void HandleExitButtonClick()
@@ -100,16 +126,6 @@ public class ViewManager : MonoBehaviour
         overlayWindow.OpenWindow();
     }
 
-    private void Update()
-    {
-        if ( Input.GetKeyDown(KeyCode.Escape) )
-        {
-            HandleExitButtonClick();
-        } else if ( Input.GetKeyDown(KeyCode.Space) && !GameManager.currentGame.Challenge )
-        {
-            HandleRepeatButtonClick();
-        }
-    }
 
     /// <summary>
     /// Plays the sequence of buttons. Disables buttons while playing
@@ -122,13 +138,13 @@ public class ViewManager : MonoBehaviour
         if ( !GameSetup.SelectedConfig.RepeatMode )
         {
             // Play only the last button in sequence
-            yield return PlayButton(GameManager.Sequence.Last());
+            yield return PlayButton(gameManager.Sequence.Last());
             EnableButtons(true);
             yield break;
         }
 
         // play sequance
-        foreach ( var butt in GameManager.Sequence )
+        foreach ( var butt in gameManager.Sequence )
         {
             yield return PlayButton(butt);
         }
@@ -139,7 +155,7 @@ public class ViewManager : MonoBehaviour
 
     private IEnumerator PlayButton(int index)
     {
-        StartCoroutine(buttons[index].ActivateButton());
+        Instance.StartCoroutine(buttons[index].ActivateButton());
         yield return new WaitForSeconds(GameDelay);
     }
 }
