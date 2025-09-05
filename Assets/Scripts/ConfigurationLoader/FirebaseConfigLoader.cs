@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Firebase;
 using Firebase.RemoteConfig;
-using Newtonsoft.Json;
-using UnityEngine;
 using System.Threading.Tasks;
 
 namespace ConfigurationLoader

@@ -1,21 +1,15 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    static GameObject helperObject;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void OnApplicationLoad()
     {
-        var helperObject = new GameObject("OnApplicationLoadHelper",
-            new System.Type[]{
-                typeof(GameSetup), // Load config
-                typeof(Leaderboard) // Load database
-            }
-        );
-
         SettingsWindow.LoadSettings();
-
-        Destroy(helperObject.gameObject);
     }
 
     public void OnPlayButtonClick()

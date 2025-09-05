@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -10,7 +12,7 @@ using UnityEngine.UI;
 // Can also be a generic and abstract class but theres no real need for that (Leaderboard<PlayerScore> : Table<T> : OverlayWindwo (even less neccessary) : MonoBehaviour)
 public class Leaderboard : MonoBehaviour
 {
-    public string databaseFileName = "leaderboard.db";
+    public string databaseFileName = "SimonSays.firebase";
     public string tableName = "Leaderboard";
     public GameObject rowPrefab;
     public GameObject rowsContainer;
@@ -20,24 +22,37 @@ public class Leaderboard : MonoBehaviour
     private static List<PlayerScore> playerScores;
     private Dictionary<int, GameObject> rows;
     public static PlayerScore lastGame;
-    private static LeaderboardRepository repository;
+    private static ILeaderboardRepository repository;
     public static int Count => playerScores.Count;
     private string nextScene = "GameSetup";
+
+    private Coroutine loaderCoroutine;
 
     void Awake()
     {
         // Initialize the repository and load the scores
-        repository ??= new LeaderboardRepository(databaseFileName, tableName);
-        playerScores ??= repository.LoadScores();
+        repository ??= LeaderboardRepositoryFactory.CreateRepository(databaseFileName, tableName);
+        playerScores ??= new();
+        loaderCoroutine = StartCoroutine(LoadScoresAsync());
     }
 
-    private void Start()
+    private IEnumerator LoadScoresAsync()
     {
+        var loadTask = repository.LoadScoresAsync();
+        yield return new WaitUntil(() => loadTask.IsCompleted);
+        playerScores = loadTask.Result;
+    }
+
+    private IEnumerator Start()
+    {
+        yield return loaderCoroutine; // Wait for the loading to complete
+
+
         titleTextObject = transform.Find("WindowTitle").GetComponent<TMP_Text>();
 
         if ( lastGame != null )
         {
-            SaveScore(lastGame);
+            SaveScoreAsync(lastGame);
             nextScene = "GameSetup";
         } else
         {
@@ -79,12 +94,11 @@ public class Leaderboard : MonoBehaviour
         }
     }
 
-    private PlayerScore SaveScore(PlayerScore newScore)
+    private void SaveScoreAsync(PlayerScore newScore)
     {
-        repository.SaveScore(newScore);
         playerScores.Add(newScore);
         playerScores = playerScores.OrderByDescending(score => score.Score).ToList();
-        return newScore;
+        repository.SaveScoreAsync(newScore);
     }
 
     public void CloseWindow()
@@ -119,10 +133,15 @@ public class Leaderboard : MonoBehaviour
 [System.Serializable]
 public class PlayerScore
 {
+    [JsonProperty("Id")]
     public int Id { get; set; }
+    [JsonProperty("PlayerName")]
     public string PlayerName { get; set; }
+    [JsonProperty("Score")]
     public float Score { get; set; }
+    [JsonProperty("Difficulty")]
     public int Difficulty { get; set; }
+    [JsonProperty("Challenge")]
     public bool Challenge { get; set; }
     [System.NonSerialized]
     public bool gameWon;
