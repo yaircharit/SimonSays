@@ -23,10 +23,10 @@ public class Leaderboard : MonoBehaviour
     private Dictionary<int, GameObject> rows;
     public static PlayerScore lastGame;
     private static ILeaderboardRepository repository;
-    public static int Count => playerScores.Count;
+    public static int Count => playerScores?.Count ?? 0;
     private string nextScene = "GameSetup";
 
-    private Coroutine loaderCoroutine;
+    private static Coroutine loaderCoroutine;
 
     void Awake()
     {
@@ -96,6 +96,7 @@ public class Leaderboard : MonoBehaviour
 
     private void SaveScoreAsync(PlayerScore newScore)
     {
+        newScore.Id = Count + 1;
         playerScores.Add(newScore);
         playerScores = playerScores.OrderByDescending(score => score.Score).ToList();
         repository.SaveScoreAsync(newScore);

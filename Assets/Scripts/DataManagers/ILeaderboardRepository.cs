@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 public abstract class ILeaderboardRepository
 {
+    protected string dbFileName;
     protected string tableName;
 
     protected ILeaderboardRepository(string dbFileName, string tableName)
     {
+        this.dbFileName = dbFileName;
         this.tableName = tableName;
         OpenConnection( dbFileName);
         CreateTable(tableName);

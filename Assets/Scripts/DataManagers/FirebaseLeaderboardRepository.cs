@@ -1,16 +1,11 @@
-﻿using Firebase.Database;
+﻿using ConfigurationLoader;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
 public class FirebaseLeaderboardRepository : ILeaderboardRepository
 {
-    private DatabaseReference _dbRef;
-
     public FirebaseLeaderboardRepository(string dbFileName, string tableName) : base(dbFileName, tableName)
     {
 
@@ -23,25 +18,22 @@ public class FirebaseLeaderboardRepository : ILeaderboardRepository
 
     public override async Task<List<PlayerScore>> LoadScoresAsync()
     {
-        var snapshot = await _dbRef.GetValueAsync();
-
+        var snapshot = await FirebaseRestAPI.Get($"{dbFileName}/{tableName}");
         var leaderboard = new List<PlayerScore>();
-
-        //Debug.Log(snapshot.);
-
-        if (snapshot.Exists)
+        Debug.Log(snapshot);
+        if (snapshot != null && snapshot != "")
         {
-            foreach (var child in snapshot.Children.Where((ch)=>ch.Value != null))
+            var snapshotObj = JsonConvert.DeserializeObject<Dictionary<string,object>>(snapshot);
+            foreach (var child in snapshotObj.Values)
             {
-                //Debug.Log(child.GetRawJsonValue());
                 try
                 {
-                    var entry = JsonConvert.DeserializeObject<PlayerScore>(child.GetRawJsonValue());
+                    var entry = JsonConvert.DeserializeObject<PlayerScore>(child.ToString());
                     leaderboard.Add(entry);
                 }
                 catch (System.Exception)
                 {
-                    Debug.LogError($"Failed to parse leaderboard entry: {child.GetRawJsonValue()}");
+                    Debug.LogError($"Failed to parse leaderboard entry: {child}");
                 }
             }
         }
@@ -54,9 +46,8 @@ public class FirebaseLeaderboardRepository : ILeaderboardRepository
     public async override Task SaveScoreAsync(PlayerScore entry)
     {
         // Push a new entry (auto-generated key)
-        string key = _dbRef.Push().Key;
         string json = JsonConvert.SerializeObject(entry);
-        await _dbRef.Child(key).SetRawJsonValueAsync(json);
+        await FirebaseRestAPI.Put($"{dbFileName}/{tableName}", json);
 
     }
 
@@ -68,6 +59,6 @@ public class FirebaseLeaderboardRepository : ILeaderboardRepository
 
     protected override void OpenConnection(string dbFileName)
     {
-        _dbRef = FirebaseDatabase.DefaultInstance.RootReference.Child($"{dbFileName}/{tableName}");
+        //_dbRef = FirebaseDatabase.DefaultInstance.RootReference.Child($"{dbFileName}/{tableName}");
     }
 }

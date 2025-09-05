@@ -119,7 +119,7 @@ namespace ConfigurationLoader
                     Instance = new XMLConfigLoader<T>(configPath);
                     break;
                 case ".firebase":
-                    Instance = new FirebaseConfigLoader<T>(Path.GetFileNameWithoutExtension(configPath));
+                    Instance = new FirebaseConfigLoader<T>(configPath.Substring(0, configPath.Length - ".firebase".Length));
                     break;
                 default:
                     throw new NotSupportedException("Unsupported configuration file format.");

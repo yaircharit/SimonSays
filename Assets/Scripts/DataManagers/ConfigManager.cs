@@ -2,6 +2,7 @@
 using ConfigurationLoader;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -55,10 +56,13 @@ public static class ConfigManager
         if (_configs != null || _isLoading) return;
 
         _isLoading = true;
-        string path = Path.Combine(Application.streamingAssetsPath, FileName);
+        string path = (Path.GetExtension(FileName) == ".firebase") ? 
+            FileName : Path.Combine(Application.streamingAssetsPath, FileName);
+
         try
         {
             _configs = await ConfigLoader<AppConfig>.LoadConfigAsync(path);
+            _configs = _configs.OrderBy(c => c.PointsEachStep).ToList();
             Debug.Log($"[ConfigManager] Loaded {_configs.Count} configs");
         }
         catch (System.Exception ex)

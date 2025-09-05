@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7caa1d9a5d3593846aa06ad0a4a4a857, type: 3}
   m_Name: ConfigSettings
   m_EditorClassIdentifier: 
-  configFileName: SimonSaysConfig.firebase
+  configFileName: SimonSays/Configs.firebase

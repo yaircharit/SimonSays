@@ -372,3 +372,4 @@ FodyWeavers.xsd
 *.db
 /Assets/StreamingAssets/google-services-desktop.json
 /Assets/StreamingAssets/google-services.json
+/Builds

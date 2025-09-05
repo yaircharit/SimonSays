@@ -1,7 +1,4 @@
 using System;
-using System.IO;
-using Firebase;
-using Firebase.RemoteConfig;
 using System.Threading.Tasks;
 
 namespace ConfigurationLoader
@@ -19,19 +16,13 @@ namespace ConfigurationLoader
         // This method should be called from a coroutine or async context
         protected override async Task<string> GetRawDataAsync()
         {
-            var depStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
-            if (depStatus != DependencyStatus.Available)
-                throw new InvalidOperationException("Could not resolve all Firebase dependencies: " + depStatus);
-
-            var rc = FirebaseRemoteConfig.DefaultInstance;
-            await rc.FetchAsync(TimeSpan.FromSeconds(30));
-            await rc.ActivateAsync();
-
-            var cfgValue = rc.GetValue(configPath).StringValue;
-            if (string.IsNullOrEmpty(cfgValue))
-                throw new FileNotFoundException($"Remote Config parameter '{configPath}' not found or empty.");
-
-            return cfgValue;
+            var task = FirebaseRestAPI.Get(configPath);
+            await task;
+            if (task.IsFaulted)
+            {
+                throw new Exception("Error fetching data from Firebase: " + task.Exception);
+            }
+            return task.Result;
         }
     }
 }
