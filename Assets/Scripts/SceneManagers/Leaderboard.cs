@@ -31,7 +31,7 @@ public class Leaderboard : MonoBehaviour
     void Awake()
     {
         // Initialize the repository and load the scores
-        repository ??= LeaderboardRepositoryFactory.CreateRepository(databaseFileName, tableName);
+        repository ??= ILeaderboardRepository.CreateRepository(databaseFileName, tableName);
         playerScores ??= new();
         loaderCoroutine = StartCoroutine(LoadScoresAsync());
     }

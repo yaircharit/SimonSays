@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +25,15 @@ public abstract class ILeaderboardRepository
     public abstract void CloseConnection();
 
 
-
+    public static ILeaderboardRepository CreateRepository(string dbFileName = "leaderboard.db", string tableName = "Leaderboard")
+    {
+        return Path.GetExtension(dbFileName) switch
+        {
+            ".db" => new SQLLeaderboardRepository(dbFileName, tableName),
+            ".firebase" => new FirebaseLeaderboardRepository(Path.GetFileNameWithoutExtension(dbFileName), tableName),
+            _ => throw new ArgumentException("Invalid repository type"),
+        };
+    }
 
 
 }
