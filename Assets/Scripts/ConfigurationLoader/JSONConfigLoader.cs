@@ -7,13 +7,13 @@ namespace ConfigurationLoader
     /// <summary>
     /// Class responsible for loading and deserialize JSON configuration files.
     /// </summary>
-    internal class JsonConfigLoader<T> : ConfigLoader<T> where T : class
+    public class JsonConfigLoader<T> : ConfigLoader<T> where T : class
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonConfigLoader"/> class.
         /// </summary>
         /// <param name="configPath">The path to the JSON configuration file.</param>
-        internal JsonConfigLoader(string configPath) : base(configPath)
+        public JsonConfigLoader(string configPath) : base(configPath)
         {
         }
 
@@ -21,7 +21,7 @@ namespace ConfigurationLoader
         /// Deserializes the raw JSON data
         /// </summary>
         /// <param name="rawData">The raw JSON data as a string.</param>
-        /// <returns>A list of objects of type <see cref="T"></returns>
+        /// <returns>A list of objects of type <see cref="T"/></returns>
         /// <exception cref="JsonException">Thrown when the JSON data cannot be deserialized to a list or dictionary</exception>
         protected override List<T> Deserialize(string rawData)
         {

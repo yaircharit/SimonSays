@@ -370,3 +370,5 @@ FodyWeavers.xsd
 /Assets/TextMesh Pro
 /App.config
 *.db
+/Assets/StreamingAssets/google-services-desktop.json
+/Assets/StreamingAssets/google-services.json

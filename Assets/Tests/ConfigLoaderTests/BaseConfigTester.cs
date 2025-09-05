@@ -38,8 +38,9 @@ namespace ConfigLoaderUnitTests
         public void Setup()
         {
             var temp = GetFullPathToFile(ConfigFileName);
-            configData = ConfigLoader<Configuration>.LoadConfig(GetFullPathToFile(ConfigFileName))
-                .ToDictionary(config => config.Name, config => config);
+            // Await the Task to get the List<Configuration> before calling ToDictionary
+            var configList = ConfigLoader<Configuration>.LoadConfigAsync(GetFullPathToFile(ConfigFileName)).GetAwaiter().GetResult();
+            configData = configList.ToDictionary(config => config.Name, config => config);
         }
 
         [Test]
@@ -92,7 +93,7 @@ namespace ConfigLoaderUnitTests
         public void TestLoadNonExistingFile()
         {
             Assert.That(() =>
-                ConfigLoader<Configuration>.LoadConfig(GetFullPathToFile(NonExistingConfigFileeName)),
+                ConfigLoader<Configuration>.LoadConfigAsync(GetFullPathToFile(NonExistingConfigFileeName)),
                 Throws.TypeOf<FileNotFoundException>()
             );
         }
@@ -101,7 +102,7 @@ namespace ConfigLoaderUnitTests
         public void TestLoadNonCompatibleFile()
         {
             Assert.That(() =>
-                ConfigLoader<Configuration>.LoadConfig(GetFullPathToFile(NonCompConfigFileName)),
+                ConfigLoader<Configuration>.LoadConfigAsync(GetFullPathToFile(NonCompConfigFileName)),
                 Throws.TypeOf<InvalidOperationException>()
             );
         }

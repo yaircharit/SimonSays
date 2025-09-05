@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ConfigurationLoader
 {
@@ -17,18 +18,20 @@ namespace ConfigurationLoader
 
         public static ConfigLoader<T> Instance
         {
-            get {
-                lock ( padlock )
+            get
+            {
+                lock (padlock)
                 {
-                    if ( instance == null )
+                    if (instance == null)
                     {
                         throw new InvalidOperationException("Instance not created. Call LoadConfig method first.");
                     }
                     return instance;
                 }
             }
-            private set {
-                lock ( padlock )
+            private set
+            {
+                lock (padlock)
                 {
                     instance = value;
                 }
@@ -52,6 +55,17 @@ namespace ConfigurationLoader
         /// <returns>A list of all objects </returns>
         protected abstract List<T> Deserialize(string rawData);
 
+
+        /// <summary>
+        /// Gets the raw data for this configuration loader. Override in subclasses to change the source
+        /// (for example: remote fetch from Firebase Remote Config).
+        /// </summary>
+        /// <returns>Raw configuration as string.</returns>
+        protected virtual async Task<string> GetRawDataAsync()
+        {
+            return await Task.Run(() => File.ReadAllText(configPath));
+        }
+
         /// <summary>
         /// Parses the raw data from the configuration file
         /// </summary>
@@ -64,16 +78,17 @@ namespace ConfigurationLoader
         /// <exception cref="PathTooLongException">Thrown when the specified path, file name, or both exceed the system-defined maximum length.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
         /// <returns>A list of objects from the configuraion file</returns>
-        private List<T> ParseRawData()
+        private async Task<List<T>> ParseRawDataAsync()
         {
 
-            string rawData = File.ReadAllText(configPath); // Not in try/catch to throw the appropriate exception of File.ReadAllText
+            // Allow subclasses to override how raw data is obtained (file, remote, etc.)
+            string rawData = await GetRawDataAsync(); // Not in try/catch to allow underlying IO exceptions to bubble up
 
             try
             {
                 return Deserialize(rawData);
             }
-            catch ( Exception e )
+            catch (Exception e)
             {
                 // Throw an exception if deserialization failed
                 throw new InvalidOperationException("Failed to deserialize configuration data.", e);
@@ -93,9 +108,9 @@ namespace ConfigurationLoader
         /// <exception cref="ArgumentException">Thrown when the path is invalid.</exception>
         /// <exception cref="PathTooLongException">Thrown when the specified path, file name, or both exceed the system-defined maximum length.</exception>
         /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
-        public static List<T> LoadConfig(string configPath)
+        public static async Task<List<T>> LoadConfigAsync(string configPath)
         {
-            switch ( Path.GetExtension(configPath).ToLowerInvariant() )
+            switch (Path.GetExtension(configPath).ToLowerInvariant())
             {
                 case ".json":
                     Instance = new JsonConfigLoader<T>(configPath);
@@ -103,10 +118,14 @@ namespace ConfigurationLoader
                 case ".xml":
                     Instance = new XMLConfigLoader<T>(configPath);
                     break;
+                case ".firebase":
+                    Instance = new FirebaseConfigLoader<T>(Path.GetFileNameWithoutExtension(configPath));
+                    break;
                 default:
                     throw new NotSupportedException("Unsupported configuration file format.");
             }
-            return Instance.ParseRawData();
+
+            return await Instance.ParseRawDataAsync();
         }
     }
 }

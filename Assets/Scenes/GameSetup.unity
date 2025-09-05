@@ -1480,7 +1480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ebcce506f6ad344dae36f0d7d901a3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configFileName: config.json
+  configFileName: SimonSaysConfig.firebase
   buttonPrefab: {fileID: 3242793917371196675, guid: 96a9b994401f2ca4fbc80e22ea1a3728, type: 3}
 --- !u!1 &2076601265
 GameObject:
