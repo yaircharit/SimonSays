@@ -11,15 +11,15 @@ public static class ConfigManager
     private static List<AppConfig> _configs;
     private static bool _isLoading;
 
-    private static ConfigSettings _settings;
+    private static AppSettings _settings;
 
-    public static ConfigSettings Settings
+    public static AppSettings Settings
     {
         get
         {
             if (_settings == null)
             {
-                _settings = Resources.Load<ConfigSettings>("ConfigSettings");
+                _settings = Resources.Load<AppSettings>("AppSettings");
                 if (_settings == null)
                 {
                     Debug.LogError("ConfigSettings.asset not found in Resources!");
@@ -47,7 +47,6 @@ public static class ConfigManager
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void OnAppStart()
     {
-        Debug.Log("Application started — loading configs...");
         LoadConfigsAsync().GetAwaiter();
     }
 

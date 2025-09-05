@@ -12,7 +12,6 @@ namespace ConfigurationLoader
         public static async Task<string> Get(string path)
         {
             string url = $"{baseUrl}{path}.json";
-            Debug.Log(url);
             using (UnityWebRequest www = UnityWebRequest.Get(url))
             {
                 var op = www.SendWebRequest();

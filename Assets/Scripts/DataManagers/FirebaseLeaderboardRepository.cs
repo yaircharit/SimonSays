@@ -20,7 +20,6 @@ public class FirebaseLeaderboardRepository : ILeaderboardRepository
     {
         var snapshot = await FirebaseRestAPI.Get($"{dbFileName}/{tableName}");
         var leaderboard = new List<PlayerScore>();
-        Debug.Log(snapshot);
         if (snapshot != null && snapshot != "")
         {
             var snapshotObj = JsonConvert.DeserializeObject<Dictionary<string,object>>(snapshot);

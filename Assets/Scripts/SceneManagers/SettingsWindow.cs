@@ -43,7 +43,7 @@ public class SettingsWindow : MonoBehaviour
 
     public static bool Fullscreen
     {
-        get => PlayerPrefs.GetInt(FullscreenKey, 1) == 1; // Default is fullscreen
+        get => PlayerPrefs.GetInt(FullscreenKey, 0) == 1; // Default is not fullscreen
         set { PlayerPrefs.SetInt(FullscreenKey, value ? 1 : 0); }
     }
     #endregion PlayerPrefsAccess

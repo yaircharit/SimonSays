@@ -4,12 +4,14 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    static GameObject helperObject;
+    public GameObject exitButton;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void OnApplicationLoad()
+    public void Start()
     {
-        SettingsWindow.LoadSettings();
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
+            exitButton.SetActive(false);
+        else
+            SettingsWindow.LoadSettings();
     }
 
     public void OnPlayButtonClick()
