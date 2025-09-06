@@ -11,7 +11,7 @@ namespace Core.Configs
         private static List<T> _configs;
         private static bool _isLoading;
 
-        public static string FileName => Core.Settings.SettingsManager.Settings.remoteConfigPath;
+        public static string FileName => Core.Settings.SettingsManager.Settings.configPath;
 
         public static List<T> Configs
         {

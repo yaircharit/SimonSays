@@ -47,8 +47,7 @@ namespace Core.LeaderboardRepository
         {
             // Push a new entry (auto-generated key)
             string json = JsonConvert.SerializeObject(entry);
-            await FirebaseRestAPI.Put($"{dbFileName}/{tableName}", json);
-
+            await FirebaseRestAPI.Post(FirebaseRestAPI.GetURL($"{dbFileName}/{tableName}"), json);
         }
 
 

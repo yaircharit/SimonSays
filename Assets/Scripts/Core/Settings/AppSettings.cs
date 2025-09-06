@@ -7,7 +7,11 @@ namespace Core.Settings
     public class AppSettings : ScriptableObject
     {
         [SerializeField]
-        public string localConfigPath = "config.json";
+        public string configPath = "config.firebase";
+        [SerializeField]
+        public string databaseFilePath = "SimonSays.firebase";
+        [SerializeField]
+        public string leaderboardTableName = "Leaderboard";
 
         [Header("Firebase Settings")]
         [SerializeField]
@@ -18,9 +22,6 @@ namespace Core.Settings
         public string databasePath = "https://your-project-id.firebaseio.com/";
         [SerializeField]
         public string apiKey = "your-api";
-        [SerializeField]
-        public string leaderboardTableName = "Leaderboard";
-        [SerializeField]
-        public string remoteConfigPath = "config.json";
+
     }
 }

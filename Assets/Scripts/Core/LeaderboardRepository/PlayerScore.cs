@@ -15,5 +15,15 @@ public class PlayerScore
     public bool Challenge { get; set; }
     [System.NonSerialized]
     public bool gameWon;
+
+    public PlayerScore()
+    {
+        Id = -1;
+        PlayerName = null;
+        Score = 0;
+        Difficulty = 0;
+        Challenge = false;
+        gameWon = false;
+    }
 }
 

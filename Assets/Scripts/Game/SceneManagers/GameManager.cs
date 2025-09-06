@@ -28,7 +28,7 @@ public class GameManager
             Id = -1, 
             PlayerName = GameSetup.PlayerName,
             Score = 0,
-            Challenge = currentGame.Challenge, 
+            Challenge = GameSetup.ChallengeMode, 
             Difficulty = GameSetup.SelectedConfigIndex
         };
 

@@ -12,8 +12,6 @@ using Core.LeaderboardRepository;
 // Can also be a generic and abstract class but theres no real need for that (Leaderboard<PlayerScore> : Table<T> : OverlayWindwo (even less neccessary) : MonoBehaviour)
 public class Leaderboard : MonoBehaviour
 {
-    public string databaseFileName = "SimonSays.firebase";
-    public string tableName = "Leaderboard";
     public GameObject rowPrefab;
     public GameObject rowsContainer;
     public Color hightlightColor = Color.yellow;
@@ -31,7 +29,7 @@ public class Leaderboard : MonoBehaviour
     void Awake()
     {
         // Initialize the repository and load the scores
-        repository ??= LeaderboardRepository.CreateRepository(databaseFileName, tableName);
+        repository ??= LeaderboardRepository.CreateRepository();
         playerScores ??= new();
         loaderCoroutine = StartCoroutine(LoadScoresAsync());
     }
