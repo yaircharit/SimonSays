@@ -25,7 +25,6 @@ public class GameManager
         Sequence.Clear();
         SequenceIndex = 0;
         currentGame = new PlayerScore{ 
-            Id = -1, 
             PlayerName = GameSetup.PlayerName,
             Score = 0,
             Challenge = GameSetup.ChallengeMode, 

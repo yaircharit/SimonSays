@@ -6,7 +6,7 @@ using Core.Network.Firebase;
 
 namespace Core.LeaderboardRepository
 {
-    public class FirebaseLeaderboardRepository : LeaderboardRepository
+    public class FirebaseLeaderboardRepository<T> : LeaderboardRepository<T> where T : BaseScore, new()
     {
         public FirebaseLeaderboardRepository(string dbFileName, string tableName) : base(dbFileName, tableName) { }
 
@@ -15,12 +15,10 @@ namespace Core.LeaderboardRepository
             //throw new NotImplementedException();
         }
 
-        public override async Task<List<PlayerScore>> LoadScoresAsync()
+        public override async Task<List<T>> LoadScoresAsync()
         {
-            await FirebaseRestAPI.Login(); // Ensure logged in
-
             var snapshot = await FirebaseRestAPI.Get(FirebaseRestAPI.GetURL($"{dbFileName}/{tableName}"));
-            var leaderboard = new List<PlayerScore>();
+            var leaderboard = new List<T>();
             if (snapshot != null && snapshot != "")
             {
                 var snapshotObj = JsonConvert.DeserializeObject<Dictionary<string, object>>(snapshot);
@@ -28,7 +26,7 @@ namespace Core.LeaderboardRepository
                 {
                     try
                     {
-                        var entry = JsonConvert.DeserializeObject<PlayerScore>(child.ToString());
+                        var entry = JsonConvert.DeserializeObject<T>(child.ToString());
                         leaderboard.Add(entry);
                     }
                     catch (System.Exception)
@@ -43,8 +41,9 @@ namespace Core.LeaderboardRepository
             return leaderboard;
         }
 
-        public async override Task SaveScoreAsync(PlayerScore entry)
+        public async override Task SaveScoreAsync(T entry)
         {
+            _ =base.SaveScoreAsync(entry); // Add to local list
             // Push a new entry (auto-generated key)
             string json = JsonConvert.SerializeObject(entry);
             await FirebaseRestAPI.Post(FirebaseRestAPI.GetURL($"{dbFileName}/{tableName}"), json);

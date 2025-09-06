@@ -17,8 +17,6 @@ namespace Core.Configs
         // This method should be called from a coroutine or async context
         protected override async Task<string> GetRawDataAsync()
         {
-            await FirebaseRestAPI.Login(); // Ensure logged in
-
             var task = FirebaseRestAPI.Get(FirebaseRestAPI.GetURL(configPath));
             await task;
             if (task.IsFaulted)

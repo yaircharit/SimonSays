@@ -62,18 +62,19 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Core\Config\JSONConfigLoader.cs" />
     <Compile Include="Assets\Scripts\Core\LeaderboardRepository\FirebaseLeaderboardRepository.cs" />
+    <Compile Include="Assets\Scripts\Core\LeaderboardRepository\BaseScore.cs" />
     <Compile Include="Assets\Scripts\Core\Config\FirebaseConfigLoader.cs" />
     <Compile Include="Assets\Scripts\Core\Config\ConfigManager.cs" />
     <Compile Include="Assets\Scripts\Core\Settings\SettingsManager.cs" />
+    <Compile Include="Assets\Scripts\Core\Settings\BaseAppConfig.cs" />
     <Compile Include="Assets\Scripts\Core\LeaderboardRepository\LeaderboardRepository.cs" />
     <Compile Include="Assets\Scripts\Core\Network\RestAPI.cs" />
     <Compile Include="Assets\Scripts\Core\Config\XMLConfigLoader.cs" />
-    <Compile Include="Assets\Scripts\Core\Settings\AppConfig.cs" />
     <Compile Include="Assets\Scripts\Core\Network\FirebaseRestAPI.cs" />
-    <Compile Include="Assets\Scripts\Core\LeaderboardRepository\PlayerScore.cs" />
     <Compile Include="Assets\Scripts\Core\LeaderboardRepository\SQLLeaderboardRepository.cs" />
     <Compile Include="Assets\Scripts\Core\Config\ConfigLoader.cs" />
     <Compile Include="Assets\Scripts\Core\Settings\AppSettings.cs" />
+    <Compile Include="Assets\Scripts\Core\Bootstrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\Core\Core.asmdef" />

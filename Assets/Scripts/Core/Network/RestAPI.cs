@@ -28,7 +28,6 @@ namespace Core.Network
 
         private static async Task<string> WebRequest(string path, string method, string json = null)
         {
-            //await Login(); // Ensure logged in
             using (UnityWebRequest request = new UnityWebRequest(path, method))
             {
                 if (json != null)
@@ -44,7 +43,7 @@ namespace Core.Network
 
         private static async Task<string> HandleRequest(UnityWebRequest request)
         {
-            Debug.Log($"[RestAPI]: {request.method} {request.url}");
+            //Debug.Log($"[RestAPI]: {request.method} {request.url}");
 
             var op = request.SendWebRequest();
             while (!op.isDone) await Task.Yield();
@@ -56,7 +55,7 @@ namespace Core.Network
             }
             else
             {
-                Debug.Log("Request success: " + request.downloadHandler.text);
+                //Debug.Log("Request success: " + request.downloadHandler.text);
                 return request.downloadHandler.text;
             }
         }
