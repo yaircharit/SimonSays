@@ -30,14 +30,14 @@ namespace Tests.ConfigLoaderTests
             return Path.Combine(ConfigsFolderPath,filename);
         }
 
-        protected Dictionary<string, AppConfig> configData = null!;
+        protected Dictionary<string, TestsAppConfig> configData = null!;
 
         [SetUp]
         public void Setup()
         {
             var temp = GetFullPathToFile(ConfigFileName);
             // Await the Task to get the List<AppConfig> before calling ToDictionary
-            var configList = ConfigManager<AppConfig>.LoadConfigsAsync(GetFullPathToFile(ConfigFileName)).GetAwaiter().GetResult();
+            var configList = ConfigManager<TestsAppConfig>.LoadConfigsAsync(GetFullPathToFile(ConfigFileName)).GetAwaiter().GetResult();
             configData = configList.ToDictionary(config => config.Name, config => config);
         }
 
@@ -94,7 +94,7 @@ namespace Tests.ConfigLoaderTests
         public void TestLoadNonExistingFile()
         {
             Assert.That(() =>
-                ConfigManager<AppConfig>.LoadConfigsAsync(GetFullPathToFile(NonExistingConfigFileeName)),
+                ConfigManager<TestsAppConfig>.LoadConfigsAsync(GetFullPathToFile(NonExistingConfigFileeName)),
                 Throws.TypeOf<FileNotFoundException>()
             );
         }
@@ -103,7 +103,7 @@ namespace Tests.ConfigLoaderTests
         public void TestLoadNonCompatibleFile()
         {
             Assert.That(() =>
-                ConfigManager<AppConfig>.LoadConfigsAsync(GetFullPathToFile(NonCompConfigFileName)),
+                ConfigManager<TestsAppConfig>.LoadConfigsAsync(GetFullPathToFile(NonCompConfigFileName)),
                 Throws.TypeOf<InvalidOperationException>()
             );
         }

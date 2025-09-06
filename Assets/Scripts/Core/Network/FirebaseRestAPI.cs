@@ -15,7 +15,7 @@ namespace Core.Network.Firebase
 
     public class FirebaseRestAPI : RestAPI
     {
-        private static string baseUrl = SettingsManager.Settings.databasePath;
+        private static string baseUrl = SettingsManager.Settings.databaseUrl;
         private static string apiKey = SettingsManager.Settings.apiKey;
         private static string restEndpoint = SettingsManager.Settings.firebaseRestEndpoint;
 
@@ -35,7 +35,7 @@ namespace Core.Network.Firebase
                 return loginResponse; // Already logged in
             }
 
-            baseUrl = databaseUrl ?? SettingsManager.Settings.databasePath;
+            baseUrl = databaseUrl ?? SettingsManager.Settings.databaseUrl;
             if (!baseUrl.EndsWith("/")) baseUrl += "/";
 
             apiKey = webApiKey ?? SettingsManager.Settings.apiKey;
@@ -47,9 +47,11 @@ namespace Core.Network.Firebase
 
             if (result.IsFaulted)
             {
-                Debug.LogError("Firebase Login error: " + result.Exception);
+                Debug.LogError("[Firebase] Login error: " + result.Exception);
                 return null;
             }
+
+            Debug.Log("[Firebase] Login successful.");
             return loginResponse = JsonUtility.FromJson<FirebaseLoginResponse>(result.Result);
         }
     }

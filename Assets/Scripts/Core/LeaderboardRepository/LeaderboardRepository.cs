@@ -3,38 +3,57 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Core.LeaderboardRepository
 {
-    public abstract class LeaderboardRepository
+    public abstract class LeaderboardRepository<T> where T : BaseScore, new()
     {
+        public static LeaderboardRepository<T> Instance { get; private set; }
+
+
         protected string dbFileName;
         protected string tableName;
+
+        public List<T> values { get; private set; }
 
         protected LeaderboardRepository(string dbFileName, string tableName)
         {
             this.dbFileName = dbFileName;
             this.tableName = tableName;
+            this.values = new List<T>();
+
             OpenConnection(dbFileName);
             CreateTable(tableName);
         }
 
         protected abstract void OpenConnection(string dbFileName);
         protected abstract void CreateTable(string tableName);
-        public abstract Task<List<PlayerScore>> LoadScoresAsync();
-        public abstract Task SaveScoreAsync(PlayerScore newScore);
+        public abstract Task<List<T>> LoadScoresAsync();
+        public virtual Task SaveScoreAsync(T newScore)
+        {
+            values.Add(newScore);
+            return Task.CompletedTask;
+        }
         public abstract void CloseConnection();
 
-
-        public static LeaderboardRepository CreateRepository(string dbFileName = null, string tableName = null)
+        public static async Task InitializeAsync(string dbFileName = null, string tableName = null)
         {
-            dbFileName ??= SettingsManager.Settings.databaseFilePath;
-            tableName ??= SettingsManager.Settings.leaderboardTableName;
+            Instance ??= CreateRepository(dbFileName, tableName);
+            var scores = await Instance.LoadScoresAsync();
+            Instance.values = scores;
+            Debug.Log($"[Leaderboard] Loaded {scores.Count} scores");
+        }
+
+        public static LeaderboardRepository<T> CreateRepository(string dbFileName = null, string tableName = null)
+        {
+            dbFileName ??= SettingsManager.Settings.dbFilePath;
+            tableName ??= SettingsManager.Settings.tableName;
 
             return Path.GetExtension(dbFileName) switch
             {
-                ".db" => new SQLLeaderboardRepository(dbFileName, tableName),
-                ".firebase" => new FirebaseLeaderboardRepository(dbFileName.Substring(0, dbFileName.Length - ".firebase".Length), tableName),
+                ".db" => new SQLLeaderboardRepository<T>(dbFileName, tableName),
+                ".firebase" => new FirebaseLeaderboardRepository<T>(dbFileName.Substring(0, dbFileName.Length - ".firebase".Length), tableName),
                 _ => throw new ArgumentException("Invalid repository type"),
             };
         }

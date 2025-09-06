@@ -8,7 +8,7 @@ public class MainMenu : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void OnAppStart()
     {
-        Core.Configs.ConfigManager<AppConfig>.LoadConfigsAsync().GetAwaiter();
+        _ = Core.Bootstrapper<AppConfig, PlayerScore>.InitializeAsync();
     }
 
     public void Start()

@@ -17,40 +17,19 @@ public class Leaderboard : MonoBehaviour
     public Color hightlightColor = Color.yellow;
 
     private TMP_Text titleTextObject;
-    private static List<PlayerScore> playerScores;
-    private Dictionary<int, GameObject> rows;
+    private static List<PlayerScore> playerScores => repository.values.OrderByDescending(score => score.Score).ToList();
+    private Dictionary<PlayerScore, GameObject> rows;
     public static PlayerScore lastGame;
-    private static LeaderboardRepository repository;
-    public static int Count => playerScores?.Count ?? 0;
+    private static LeaderboardRepository<PlayerScore> repository => LeaderboardRepository<PlayerScore>.Instance;
     private string nextScene = "GameSetup";
 
-    private static Coroutine loaderCoroutine;
-
-    void Awake()
+    private void Start()
     {
-        // Initialize the repository and load the scores
-        repository ??= LeaderboardRepository.CreateRepository();
-        playerScores ??= new();
-        loaderCoroutine = StartCoroutine(LoadScoresAsync());
-    }
-
-    private IEnumerator LoadScoresAsync()
-    {
-        var loadTask = repository.LoadScoresAsync();
-        yield return new WaitUntil(() => loadTask.IsCompleted);
-        playerScores = loadTask.Result;
-    }
-
-    private IEnumerator Start()
-    {
-        yield return loaderCoroutine; // Wait for the loading to complete
-
-
         titleTextObject = transform.Find("WindowTitle").GetComponent<TMP_Text>();
 
         if ( lastGame != null )
         {
-            SaveScoreAsync(lastGame);
+            repository.SaveScoreAsync(lastGame);
             nextScene = "GameSetup";
         } else
         {
@@ -60,7 +39,6 @@ public class Leaderboard : MonoBehaviour
         rows = new();
         DisplayScores();
     }
-
 
     private void DisplayScores()
     {
@@ -80,7 +58,7 @@ public class Leaderboard : MonoBehaviour
             difficultyComponent.IsOn = score.Challenge; // Set challanage mode indication
             difficultyComponent.interactable = false;
 
-            rows[score.Id] = row;
+            rows[score] = row;
         }
 
         if ( lastGame != null ) // If the last game is over (win/lose)
@@ -92,14 +70,6 @@ public class Leaderboard : MonoBehaviour
         }
     }
 
-    private void SaveScoreAsync(PlayerScore newScore)
-    {
-        newScore.Id = Count + 1;
-        playerScores.Add(newScore);
-        playerScores = playerScores.OrderByDescending(score => score.Score).ToList();
-        repository.SaveScoreAsync(newScore);
-    }
-
     public void CloseWindow()
     {
         SceneManager.LoadScene(nextScene);
@@ -107,7 +77,7 @@ public class Leaderboard : MonoBehaviour
 
     public void HightlightRow(PlayerScore playerScore)
     {
-        rows[playerScore.Id].GetComponent<Image>().color = hightlightColor;
+        rows[playerScore].GetComponent<Image>().color = hightlightColor;
         ScrollTo(playerScore);
     }
 
@@ -115,7 +85,7 @@ public class Leaderboard : MonoBehaviour
     {
         Canvas.ForceUpdateCanvases();
         RectTransform containerRectTransform = rowsContainer.GetComponent<RectTransform>();
-        RectTransform rowRectTransform = rows[playerScore.Id].GetComponent<RectTransform>();
+        RectTransform rowRectTransform = rows[playerScore].GetComponent<RectTransform>();
 
         Vector2 rowPosition = (Vector2)containerRectTransform.InverseTransformPoint(containerRectTransform.position) - (Vector2)containerRectTransform.InverseTransformPoint(rowRectTransform.position);
         float rowHeight = rowRectTransform.rect.height;

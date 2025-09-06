@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Tests\ConfigLoaderTests\BaseConfigTester.cs" />
+    <Compile Include="Assets\Tests\ConfigLoaderTests\TestsAppConfig.cs" />
     <Compile Include="Assets\Tests\ConfigLoaderTests\JSONConfigTester.cs" />
     <Compile Include="Assets\Tests\ConfigLoaderTests\XMLConfigTester.cs" />
   </ItemGroup>
