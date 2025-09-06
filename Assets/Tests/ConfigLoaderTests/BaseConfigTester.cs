@@ -1,14 +1,12 @@
-using ConfigurationLoader;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.TestTools;
+using Core.Configs;
 
-namespace ConfigLoaderUnitTests
+namespace Tests.ConfigLoaderTests
 {
     public abstract class ConfigTesterBase : ScriptableObject
     {
@@ -32,14 +30,14 @@ namespace ConfigLoaderUnitTests
             return Path.Combine(ConfigsFolderPath,filename);
         }
 
-        protected Dictionary<string, Configuration> configData = null!;
+        protected Dictionary<string, AppConfig> configData = null!;
 
         [SetUp]
         public void Setup()
         {
             var temp = GetFullPathToFile(ConfigFileName);
-            // Await the Task to get the List<Configuration> before calling ToDictionary
-            var configList = ConfigLoader<Configuration>.LoadConfigAsync(GetFullPathToFile(ConfigFileName)).GetAwaiter().GetResult();
+            // Await the Task to get the List<AppConfig> before calling ToDictionary
+            var configList = ConfigManager<AppConfig>.LoadConfigsAsync(GetFullPathToFile(ConfigFileName)).GetAwaiter().GetResult();
             configData = configList.ToDictionary(config => config.Name, config => config);
         }
 
@@ -63,6 +61,7 @@ namespace ConfigLoaderUnitTests
             Assert.AreEqual(50, config.GameTime);
             Assert.AreEqual(true, config.RepeatMode);
             Assert.AreEqual(1.0f, config.GameSpeed);
+            Assert.AreEqual(1, config.Index);
         }
 
         [Test]
@@ -75,6 +74,7 @@ namespace ConfigLoaderUnitTests
             Assert.AreEqual(45, config.GameTime);
             Assert.AreEqual(true, config.RepeatMode);
             Assert.AreEqual(1.25f, config.GameSpeed);
+            Assert.AreEqual(2, config.Index);
         }
 
         [Test]
@@ -87,13 +87,14 @@ namespace ConfigLoaderUnitTests
             Assert.AreEqual(30, config.GameTime);
             Assert.AreEqual(false, config.RepeatMode);
             Assert.AreEqual(1.5f, config.GameSpeed);
+            Assert.AreEqual(3, config.Index);
         }
 
         [Test]
         public void TestLoadNonExistingFile()
         {
             Assert.That(() =>
-                ConfigLoader<Configuration>.LoadConfigAsync(GetFullPathToFile(NonExistingConfigFileeName)),
+                ConfigManager<AppConfig>.LoadConfigsAsync(GetFullPathToFile(NonExistingConfigFileeName)),
                 Throws.TypeOf<FileNotFoundException>()
             );
         }
@@ -102,7 +103,7 @@ namespace ConfigLoaderUnitTests
         public void TestLoadNonCompatibleFile()
         {
             Assert.That(() =>
-                ConfigLoader<Configuration>.LoadConfigAsync(GetFullPathToFile(NonCompConfigFileName)),
+                ConfigManager<AppConfig>.LoadConfigsAsync(GetFullPathToFile(NonCompConfigFileName)),
                 Throws.TypeOf<InvalidOperationException>()
             );
         }

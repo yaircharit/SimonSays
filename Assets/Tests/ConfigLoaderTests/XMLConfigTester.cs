@@ -1,7 +1,5 @@
 
-using UnityEngine;
-
-namespace ConfigLoaderUnitTests
+namespace Tests.ConfigLoaderTests
 {
     public sealed class XMLConfigTester : ConfigTesterBase
     {
