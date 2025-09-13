@@ -12,8 +12,10 @@ public class SimonSays : MonoBehaviour
 {
     public static SimonSays Instance { get; private set; }
 
-    public GameObject buttonPrefab;
-    public float buttonsRadius = 2.7f;
+    public GameButton buttonPrefab;
+    [SerializeField]
+    [Range(0f,0.5f)]
+    public float radiusPrecentage = 0.3f;
     public AudioClip[] sounds;
     public static AudioClip[] Sounds => Instance.sounds;
     public Color[] buttonColors = { Color.red, Color.green, Color.blue, Color.yellow, Color.magenta, Color.cyan };
@@ -55,6 +57,9 @@ public class SimonSays : MonoBehaviour
         // Apply selected config
         repeatButton.gameObject.SetActive(!GameManager.currentGame.Challenge);        
 
+        var rt = transform as RectTransform;
+
+        radiusPrecentage = Mathf.Min(rt.rect.width, rt.rect.height) * radiusPrecentage * rt.localScale.x; // Adjust radius based on button count
         SpawnButtons(GameSetup.SelectedConfig.GameButtons);
     }
 
@@ -98,9 +103,9 @@ public class SimonSays : MonoBehaviour
         for ( int i = 0; i < count; i++ )
         {
             float angle = i * angleStep * Mathf.Deg2Rad; // Convert angle to radians
-            pos.x = Mathf.Cos(angle) * buttonsRadius;
-            pos.y = Mathf.Sin(angle) * buttonsRadius;
-            buttons[i] = Instantiate(buttonPrefab, pos, Quaternion.identity, buttonsContainer).GetComponent<GameButton>();
+            pos.x = Mathf.Cos(angle) * radiusPrecentage;
+            pos.y = Mathf.Sin(angle) * radiusPrecentage;
+            buttons[i] = Instantiate(buttonPrefab, pos, Quaternion.identity, buttonsContainer);
         }
     }
 

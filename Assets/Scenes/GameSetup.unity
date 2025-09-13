@@ -1135,6 +1135,7 @@ GameObject:
   - component: {fileID: 1812406494}
   - component: {fileID: 1812406493}
   - component: {fileID: 1812406492}
+  - component: {fileID: 1812406495}
   m_Layer: 5
   m_Name: InputField (TMP)
   m_TagString: Untagged
@@ -1298,6 +1299,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1812406490}
   m_CullTransparentMesh: 1
+--- !u!114 &1812406495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1812406490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showHtmlElement: 0
 --- !u!1 &1905308380 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 531031686207847680, guid: bca3cf0cf5923354a94252f7f41a3bfd, type: 3}
@@ -1480,7 +1494,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ebcce506f6ad344dae36f0d7d901a3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  configFileName: SimonSaysConfig.firebase
   buttonPrefab: {fileID: 3242793917371196675, guid: 96a9b994401f2ca4fbc80e22ea1a3728, type: 3}
 --- !u!1 &2076601265
 GameObject:
