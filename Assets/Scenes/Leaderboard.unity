@@ -843,11 +843,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ab8a3597228131439bd861c7904ed8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  databaseFileName: SimonSays.firebase
-  tableName: Leaderboard
-  rowPrefab: {fileID: 6913367886383573910, guid: 9ca8eda50a3968942ac6f2d4c0907ba1, type: 3}
+  rowPrefab: {fileID: 4267699310803949269, guid: 9ca8eda50a3968942ac6f2d4c0907ba1, type: 3}
   rowsContainer: {fileID: 314502706}
   hightlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  titleTextObject: {fileID: 1318327504}
 --- !u!1 &962587174
 GameObject:
   m_ObjectHideFlags: 0

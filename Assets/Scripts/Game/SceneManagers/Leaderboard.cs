@@ -12,21 +12,22 @@ using Core.LeaderboardRepository;
 // Can also be a generic and abstract class but theres no real need for that (Leaderboard<PlayerScore> : Table<T> : OverlayWindwo (even less neccessary) : MonoBehaviour)
 public class Leaderboard : MonoBehaviour
 {
-    public GameObject rowPrefab;
-    public GameObject rowsContainer;
-    public Color hightlightColor = Color.yellow;
-
+    [SerializeField]
+    private ScoreRow rowPrefab;
+    [SerializeField]
+    private GameObject rowsContainer;
+    [SerializeField]
+    private Color hightlightColor = Color.yellow;
+    [SerializeField]
     private TMP_Text titleTextObject;
     private static List<PlayerScore> playerScores => repository.values.OrderByDescending(score => score.Score).ToList();
-    private Dictionary<PlayerScore, GameObject> rows;
+    private Dictionary<PlayerScore, ScoreRow> rows;
     public static PlayerScore lastGame;
     private static LeaderboardRepository<PlayerScore> repository => LeaderboardRepository<PlayerScore>.Instance;
     private string nextScene = "GameSetup";
 
     private void Start()
     {
-        titleTextObject = transform.Find("WindowTitle").GetComponent<TMP_Text>();
-
         if ( lastGame != null )
         {
             repository.SaveScoreAsync(lastGame);
@@ -46,14 +47,14 @@ public class Leaderboard : MonoBehaviour
 
         foreach ( var score in playerScores )
         {
-            GameObject row = Instantiate(rowPrefab, rowsContainer.transform);
+            ScoreRow row = Instantiate(rowPrefab, rowsContainer.transform);
             var textComponents = row.GetComponentsInChildren<TextMeshProUGUI>();
 
-            textComponents[0].text = rank++.ToString(); // Rank
-            textComponents[1].text = score.PlayerName; // Player Name
-            textComponents[3].text = score.Score.ToString(); // Score. Skipping index=2 cuz of Text component in Challenge Mode object
+            row.Rank = rank++; // Rank
+            row.PlayerName = score.PlayerName; // Player Name
+            row.Score = score.Score; // Score. Skipping index=2 cuz of Text component in Challenge Mode object
 
-            var difficultyComponent = row.GetComponentInChildren<ChallengeModeToggle>();
+            var difficultyComponent = row.ChallengeModeToggle;
             difficultyComponent.SetDifficulty(score.Difficulty); // Set difficulty level and color
             difficultyComponent.IsOn = score.Challenge; // Set challanage mode indication
             difficultyComponent.interactable = false;

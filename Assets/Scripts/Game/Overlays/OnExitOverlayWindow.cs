@@ -8,12 +8,14 @@ public class OnExitOverlayWindow : OverlayWindow
     protected override void OnClose()
     {
         Time.timeScale = timeScale; // Resume game
+        SimonSays.Instance.EnableButtons(true);
     }
 
     protected override void OnOpen()
     {
         timeScale = Time.timeScale;
         Time.timeScale = 0; // Pause game
+        SimonSays.Instance.EnableButtons(false);
     }
 
     public override void OnSubmit()

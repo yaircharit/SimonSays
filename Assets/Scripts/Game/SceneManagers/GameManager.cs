@@ -24,14 +24,10 @@ public class GameManager
     {
         Sequence.Clear();
         SequenceIndex = 0;
-        currentGame = new PlayerScore{ 
-            PlayerName = GameSetup.PlayerName,
-            Score = 0,
-            Challenge = GameSetup.ChallengeMode, 
-            Difficulty = GameSetup.SelectedConfigIndex
-        };
 
+        currentGame = GameSetup.GetNewGame();
         TimeRemaining = GameSetup.SelectedConfig.GameTime;
+
         if ( currentGame.Challenge )
         {
             Time.timeScale = GameSetup.SelectedConfig.GameSpeed; // Set game speed if challenge mode was selected

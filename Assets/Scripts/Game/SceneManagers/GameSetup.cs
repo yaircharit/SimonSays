@@ -10,9 +10,11 @@ using Core.Configs;
 /// </summary>
 public class GameSetup : MonoBehaviour
 {
-    public GameObject buttonPrefab;
-
+    [SerializeField]
+    public DifficultyButton buttonPrefab;
+    [SerializeField]
     private PlayerNameOverlayWindow overlayWindow;
+    [SerializeField]
     private Transform buttonsContainer;
 
     #region GlobalVars
@@ -44,15 +46,12 @@ public class GameSetup : MonoBehaviour
             return;
         }
 
-        overlayWindow = transform.Find("OverlayWindow").GetComponent<PlayerNameOverlayWindow>();
-        buttonsContainer = transform.Find("Container").Find("ButtonsContainer");
-
         // Initialize buttons for each config
         foreach (var cnf in ConfigManager<AppConfig>.Configs)
         {
-            Button tempButt = Instantiate(buttonPrefab, buttonsContainer).GetComponent<Button>();
-            tempButt.GetComponentInChildren<TextMeshProUGUI>().text = cnf.Name;
-            tempButt.onClick.AddListener(() => OnButtonClick(cnf));
+            DifficultyButton tempButt = Instantiate(buttonPrefab, buttonsContainer);
+            tempButt.ButtonText = cnf.Name;
+            tempButt.Button.onClick.AddListener(() => OnButtonClick(cnf));
         }
     }
 
@@ -67,5 +66,16 @@ public class GameSetup : MonoBehaviour
     public void OnBackClick()
     {
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public static PlayerScore GetNewGame()
+    {
+        return new PlayerScore
+        {
+            PlayerName = PlayerName,
+            Score = 0,
+            Challenge = ChallengeMode,
+            Difficulty = SelectedConfigIndex
+        };
     }
 }

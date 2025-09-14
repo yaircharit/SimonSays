@@ -279,8 +279,7 @@ GameObject:
   - component: {fileID: 828585420833251536}
   - component: {fileID: 921468240902184111}
   - component: {fileID: 6097378158074135682}
-  - component: {fileID: 5363592060375106704}
-  - component: {fileID: 6598743089726056518}
+  - component: {fileID: 4267699310803949269}
   m_Layer: 5
   m_Name: ScoreRow
   m_TagString: Untagged
@@ -349,46 +348,22 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 0.5
---- !u!114 &5363592060375106704
+--- !u!114 &4267699310803949269
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6913367886383573910}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: a840727981f8b47469f75a56da335854, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 3
-  m_Spacing: 140
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
---- !u!114 &6598743089726056518
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6913367886383573910}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 2
-  m_VerticalFit: 0
+  rankText: {fileID: 2840235213460192596}
+  playerNameText: {fileID: 6038292808445902107}
+  scoreText: {fileID: 1034467865689859656}
+  challengeModeToggle: {fileID: 5323142404446032610}
 --- !u!1 &9188535382651418651
 GameObject:
   m_ObjectHideFlags: 0
@@ -744,6 +719,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: daf1ce572b67fac48892a133f3550451, type: 3}
+--- !u!114 &5323142404446032610 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8918871014033256064, guid: daf1ce572b67fac48892a133f3550451, type: 3}
+  m_PrefabInstance: {fileID: 3610101563058158690}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcd49e16617e679439486045add7239a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &8089945547491981924 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4781954887605470726, guid: daf1ce572b67fac48892a133f3550451, type: 3}

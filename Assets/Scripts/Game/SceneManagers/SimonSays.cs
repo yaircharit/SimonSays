@@ -22,13 +22,19 @@ public class SimonSays : MonoBehaviour
     public static Color[] ButtonColors => Instance.buttonColors;
     public float defaultGameDelay = 0.8f;
 
+    [SerializeField]
     private Button repeatButton;
+    [SerializeField]
     private OnExitOverlayWindow overlayWindow;
 
+    [SerializeField]
     private TMP_Text scoreTextObject;
+    [SerializeField]
     private TMP_Text timeTextObject;
-
+    [SerializeField]
     private Transform buttonsContainer;
+
+
     private GameButton[] buttons;
     private Coroutine playSequenceCoroutine;
     private static float GameDelay => Instance.defaultGameDelay / GameSetup.SelectedConfig.GameSpeed;
@@ -48,14 +54,8 @@ public class SimonSays : MonoBehaviour
 
         gameManager.Init();
 
-        overlayWindow = transform.Find("OverlayWindow").GetComponent<OnExitOverlayWindow>();
-        scoreTextObject = gameObject.GetComponentsInChildren<TMP_Text>().Single(obj => obj.name == "ScoreText");
-        timeTextObject = gameObject.GetComponentsInChildren<TMP_Text>().Single(obj => obj.name == "TimerText");
-        repeatButton = gameObject.GetComponentsInChildren<Button>().Single(obj => obj.name == "RepeatButton");
-        buttonsContainer = transform.Find("ButtonsContainer").transform;
-
         // Apply selected config
-        repeatButton.gameObject.SetActive(!GameManager.currentGame.Challenge);        
+        repeatButton.gameObject.SetActive(!GameManager.currentGame.Challenge);
 
         var rt = transform as RectTransform;
 
@@ -127,7 +127,10 @@ public class SimonSays : MonoBehaviour
 
     public void HandleExitButtonClick()
     {
-        overlayWindow.OpenWindow();
+        if (overlayWindow.IsActive)
+            overlayWindow.CloseWindow();
+        else
+            overlayWindow.OpenWindow();
     }
 
 

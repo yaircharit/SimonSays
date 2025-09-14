@@ -110,21 +110,13 @@ namespace Core.Configs
         /// <exception cref="DirectoryNotFoundException">Thrown when the specified path is invalid (for example, it is on an unmapped drive).</exception>
         public static async Task<List<T>> LoadConfigAsync(string configPath)
         {
-            switch (Path.GetExtension(configPath).ToLowerInvariant())
+            Instance = Path.GetExtension(configPath).ToLowerInvariant() switch
             {
-                case ".json":
-                    Instance = new JsonConfigLoader<T>(configPath);
-                    break;
-                case ".xml":
-                    Instance = new XMLConfigLoader<T>(configPath);
-                    break;
-                case ".firebase":
-                    Instance = new FirebaseConfigLoader<T>(configPath.Substring(0, configPath.Length - ".firebase".Length));
-                    break;
-                default:
-                    throw new NotSupportedException("Unsupported configuration file format.");
-            }
-
+                ".json" => new JsonConfigLoader<T>(configPath),
+                ".xml" => new XMLConfigLoader<T>(configPath),
+                ".firebase" => new FirebaseConfigLoader<T>(configPath.Substring(0, configPath.Length - ".firebase".Length)),
+                _ => throw new NotSupportedException("Unsupported configuration file format."),
+            };
             return await Instance.ParseRawDataAsync();
         }
     }

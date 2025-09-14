@@ -1559,6 +1559,11 @@ MonoBehaviour:
   - {r: 1, g: 0, b: 1, a: 1}
   - {r: 0, g: 1, b: 1, a: 1}
   defaultGameDelay: 0.7
+  repeatButton: {fileID: 1666537090}
+  overlayWindow: {fileID: 827864395}
+  scoreTextObject: {fileID: 1398260479}
+  timeTextObject: {fileID: 287838167}
+  buttonsContainer: {fileID: 230589955}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

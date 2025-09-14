@@ -8,16 +8,13 @@ using UnityEngine.UI;
 /// </summary>
 public class PlayerNameOverlayWindow : OverlayWindow
 {
-    public TMPro.TMP_InputField textInputField;
-    public Color noInputColor = new Color(243, 183, 183);
-    
-    public GameObject challengeModeToggleGameObject;
-    private ChallengeModeToggle toggle;
+    [SerializeField]
+    private TMPro.TMP_InputField textInputField;
+    [SerializeField]
+    private Color noInputColor = new Color(243, 183, 183);
 
-    private void Awake()
-    {
-        toggle = challengeModeToggleGameObject.GetComponent<ChallengeModeToggle>();
-    }
+    [SerializeField]
+    private ChallengeModeToggle toggle;
 
     protected override void OnOpen()
     {
@@ -26,7 +23,7 @@ public class PlayerNameOverlayWindow : OverlayWindow
         toggle.IsOn = GameSetup.ChallengeMode;
 
         // Set the difficulty, text, and color to reflect the selected difficulty
-        toggle.SetDifficulty(GameSetup.SelectedConfigIndex); 
+        toggle.SetDifficulty(GameSetup.SelectedConfigIndex);
     }
 
     public override void OnSubmit()
@@ -34,8 +31,9 @@ public class PlayerNameOverlayWindow : OverlayWindow
         string playerName = textInputField.text.Trim();
 
         // Require player input
-        if ( playerName == "" )
+        if (playerName == "")
         {
+            //TODO: must be better way than change thw color of the Image component
             textInputField.GetComponent<Image>().color = noInputColor;
             textInputField.Select();
             return;

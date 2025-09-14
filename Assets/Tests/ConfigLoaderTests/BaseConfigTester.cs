@@ -11,7 +11,7 @@ namespace Tests.ConfigLoaderTests
     public abstract class ConfigTesterBase : ScriptableObject
     {
         protected abstract string FileExtension { get; }
-        
+
         private string ConfigsFolderPath => Path.Combine(Directory.GetCurrentDirectory(), @"Assets\Tests\ConfigLoaderTests\ConfigFiles");
 
         private string _configFileName = "config";
@@ -27,7 +27,7 @@ namespace Tests.ConfigLoaderTests
 
         private string GetFullPathToFile(string filename)
         {
-            return Path.Combine(ConfigsFolderPath,filename);
+            return Path.Combine(ConfigsFolderPath, filename);
         }
 
         protected Dictionary<string, TestsAppConfig> configData = null!;

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class ChallengeModeToggle : MonoBehaviour
 {
+    //TODO: move to config
     public Color[] difficultyColors = {
         new Color(175,100,50,255), // Bronze
         new Color(160,160,160,255), // Silver
@@ -19,6 +20,7 @@ public class ChallengeModeToggle : MonoBehaviour
 
     internal static float[] gameSpeeds;
 
+    [SerializeField]
     private Toggle toggle;
     public bool IsOn
     {
@@ -31,6 +33,7 @@ public class ChallengeModeToggle : MonoBehaviour
         set { toggle.interactable = value; }
     }
 
+    [SerializeField]
     private TMP_Text label;
     public string Text
     {
@@ -38,6 +41,7 @@ public class ChallengeModeToggle : MonoBehaviour
         set { label.text = value; }
     }
 
+    [SerializeField]
     private Image image;
     public Color Color
     {
@@ -45,6 +49,7 @@ public class ChallengeModeToggle : MonoBehaviour
         set { image.color = value; }
     }
 
+    [SerializeField]
     private Image checkmarkImage;
     public Color checkmarkColor
     {
@@ -63,10 +68,6 @@ public class ChallengeModeToggle : MonoBehaviour
             // Save all possible game speeds
             gameSpeeds = Core.Configs.ConfigManager<AppConfig>.Configs.Select(config => config.GameSpeed).ToArray();
         }
-        toggle = gameObject.GetComponent<Toggle>();
-        label = gameObject.GetComponentInChildren<TMP_Text>();
-        image = gameObject.GetComponentInChildren<Image>();
-        checkmarkImage = gameObject.transform.Find("Background").GetChild(0).GetComponent<Image>();
 
         currentState = new DisabledState(this);
     }
@@ -91,6 +92,7 @@ public class ChallengeModeToggle : MonoBehaviour
         Color = difficultyColors[difficulty];
         checkmarkColor = checkmarkColors[difficulty];
 
+        // TODO: use object data instead of gameSpeed array
         if ( gameSpeeds[difficulty] == 1 )
         {
             currentState = new DisabledState(this);
