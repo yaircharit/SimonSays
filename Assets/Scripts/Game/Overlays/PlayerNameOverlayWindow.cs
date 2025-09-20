@@ -23,7 +23,7 @@ public class PlayerNameOverlayWindow : OverlayWindow
         toggle.IsOn = GameSetup.ChallengeMode;
 
         // Set the difficulty, text, and color to reflect the selected difficulty
-        toggle.SetDifficulty(GameSetup.SelectedConfigIndex);
+        toggle.SetDifficulty(GameSetup.SelectedConfig);
     }
 
     public override void OnSubmit()

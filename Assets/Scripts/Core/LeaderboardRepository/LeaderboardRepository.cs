@@ -15,13 +15,13 @@ namespace Core.LeaderboardRepository
         protected string dbFileName;
         protected string tableName;
 
-        public List<T> values { get; private set; }
+        public List<T> Values { get; private set; }
 
         protected LeaderboardRepository(string dbFileName, string tableName)
         {
             this.dbFileName = dbFileName;
             this.tableName = tableName;
-            this.values = new List<T>();
+            this.Values = new List<T>();
 
             OpenConnection(dbFileName);
             CreateTable(tableName);
@@ -32,7 +32,7 @@ namespace Core.LeaderboardRepository
         public abstract Task<List<T>> LoadScoresAsync();
         public virtual Task SaveScoreAsync(T newScore)
         {
-            values.Add(newScore);
+            Values.Add(newScore);
             return Task.CompletedTask;
         }
         public abstract void CloseConnection();
@@ -41,7 +41,7 @@ namespace Core.LeaderboardRepository
         {
             Instance ??= CreateRepository(dbFileName, tableName);
             var scores = await Instance.LoadScoresAsync();
-            Instance.values = scores;
+            Instance.Values = scores;
             Debug.Log($"[Leaderboard] Loaded {scores.Count} scores");
         }
 

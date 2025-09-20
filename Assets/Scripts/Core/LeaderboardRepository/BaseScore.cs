@@ -1,21 +1,18 @@
-﻿using Mono.Data.Sqlite;
-using Newtonsoft.Json;
-
-[System.Serializable]
+﻿[System.Serializable]
 public class BaseScore
 {
-    [JsonProperty("PlayerName")]
+    [Newtonsoft.Json.JsonProperty("PlayerName")]
     public string PlayerName { get; set; }
-    [JsonProperty("Score")]
+    [Newtonsoft.Json.JsonProperty("Score")]
     public float Score { get; set; }
 
-    public BaseScore()
+    public BaseScore(string PlayerName = null, int Score = 0)
     {
-        PlayerName = null;
-        Score = 0;
+        this.PlayerName = PlayerName;
+        this.Score = Score;
     }
 
-    public virtual void LoadFromReader(SqliteDataReader reader)
+    public virtual void LoadFromReader(Mono.Data.Sqlite.SqliteDataReader reader)
     {
         PlayerName = reader.GetString(1);
         Score = reader.GetFloat(2);

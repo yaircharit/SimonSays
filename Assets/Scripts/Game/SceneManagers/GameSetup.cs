@@ -71,11 +71,11 @@ public class GameSetup : MonoBehaviour
     public static PlayerScore GetNewGame()
     {
         return new PlayerScore
-        {
-            PlayerName = PlayerName,
-            Score = 0,
-            Challenge = ChallengeMode,
-            Difficulty = SelectedConfigIndex
-        };
+        (
+            PlayerName: PlayerName,
+            Score: 0,
+            Challenge: ChallengeMode,
+            Difficulty: SelectedConfigIndex
+        );
     }
 }

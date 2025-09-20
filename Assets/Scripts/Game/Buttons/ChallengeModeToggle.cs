@@ -1,25 +1,9 @@
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ChallengeModeToggle : MonoBehaviour
 {
-    //TODO: move to config
-    public Color[] difficultyColors = {
-        new Color(175,100,50,255), // Bronze
-        new Color(160,160,160,255), // Silver
-        new Color(255,200,0,255)  // Gold
-    };
-
-    public Color[] checkmarkColors = {
-        new Color(255, 255, 255, 255), // White
-        new Color(255,200,0,255),  // Gold
-        new Color(160,160,160,255) // Silver
-    };
-
-    internal static float[] gameSpeeds;
-
     [SerializeField]
     private Toggle toggle;
     public bool IsOn
@@ -27,7 +11,7 @@ public class ChallengeModeToggle : MonoBehaviour
         get { return toggle.isOn; }
         set { toggle.isOn = value; }
     }
-    public bool interactable
+    public bool Interactable
     {
         get { return toggle.interactable; }
         set { toggle.interactable = value; }
@@ -43,7 +27,7 @@ public class ChallengeModeToggle : MonoBehaviour
 
     [SerializeField]
     private Image image;
-    public Color Color
+    public UnityEngine.Color32 Color
     {
         get { return image.color; }
         set { image.color = value; }
@@ -51,26 +35,13 @@ public class ChallengeModeToggle : MonoBehaviour
 
     [SerializeField]
     private Image checkmarkImage;
-    public Color checkmarkColor
+    public UnityEngine.Color32 checkmarkColor
     {
         get { return checkmarkImage.color; }
         set { checkmarkImage.color = value; }
     }
 
-    public int difficulty;
-
-    private ChallengeModeState currentState;
-
-    private void Awake()
-    {
-        if ( gameSpeeds == null )
-        {
-            // Save all possible game speeds
-            gameSpeeds = Core.Configs.ConfigManager<AppConfig>.Configs.Select(config => config.GameSpeed).ToArray();
-        }
-
-        currentState = new DisabledState(this);
-    }
+    public AppConfig difficulty;
 
     /// <summary>
     /// Sets the toggle object state
@@ -86,59 +57,28 @@ public class ChallengeModeToggle : MonoBehaviour
     /// </summary>
     /// <param name="difficulty"></param>
     /// <returns>if the button is interactable</returns>
-    public bool SetDifficulty(int difficulty)
+    public void SetDifficulty(AppConfig difficulty)
     {
         this.difficulty = difficulty;
-        Color = difficultyColors[difficulty];
-        checkmarkColor = checkmarkColors[difficulty];
+        Color = difficulty.PrimaryColor;
+        checkmarkColor = difficulty.SecondaryColor;
+        Text = $"x{difficulty.GameSpeed}"; // x1.5 or x1.25 ...
 
-        // TODO: use object data instead of gameSpeed array
-        if ( gameSpeeds[difficulty] == 1 )
+        if (difficulty.GameSpeed == 1)
         {
-            currentState = new DisabledState(this);
-        } else
-        {
-            currentState = new EnabledState(this);
+            label.gameObject.SetActive(false);
+            IsOn = Interactable = false; //disable. no challenge mode when game speed is 1
         }
-
-        return currentState.Handle(difficulty);
-    }
-}
-
-public abstract class ChallengeModeState
-{
-    protected ChallengeModeToggle toggle;
-    public ChallengeModeState(ChallengeModeToggle toggle)
-    {
-        this.toggle = toggle;
-    }
-    public abstract bool Handle(int difficulty);
-}
-
-public class DisabledState : ChallengeModeState
-{
-    public DisabledState(ChallengeModeToggle toggle) : base(toggle)
-    {
+        else
+        {
+            label.gameObject.SetActive(true);
+            Interactable = true;
+            IsOn = GameSetup.ChallengeMode; //restore previous state
+        }
     }
 
-    public override bool Handle(int difficulty)
+    public void SetDifficulty(int difficultyIndex)
     {
-        toggle.Text = ""; // Don't print text if it's disabled (x1)
-        toggle.IsOn = toggle.interactable = false; //disable
-        return toggle.interactable;
-    }
-}
-
-public class EnabledState : ChallengeModeState
-{
-    public EnabledState(ChallengeModeToggle toggle) :base(toggle)
-    {
-    }
-
-    public override bool Handle(int difficulty)
-    {
-        toggle.Text = $"x{ChallengeModeToggle.gameSpeeds[difficulty]}"; // x1.5 or x1.25 ...
-        toggle.interactable = true;
-        return toggle.interactable;
+        SetDifficulty(Core.Configs.ConfigManager<AppConfig>.Configs[difficultyIndex]);
     }
 }

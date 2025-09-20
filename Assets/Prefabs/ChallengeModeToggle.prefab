@@ -366,19 +366,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcd49e16617e679439486045add7239a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  difficultyColors:
-  - {r: 0.6901961, g: 0.3921569, b: 0.19215688, a: 1}
-  - {r: 0.6313726, g: 0.6313726, b: 0.6313726, a: 1}
-  - {r: 1, g: 0.7874396, b: 0, a: 1}
-  checkmarkColors:
-  - {r: 1, g: 1, b: 1, a: 255}
-  - {r: 255, g: 200, b: 0, a: 255}
-  - {r: 0.6313726, g: 0.6313726, b: 0.6313726, a: 255}
   toggle: {fileID: 7838232884541895136}
   label: {fileID: 2143829105143518682}
   image: {fileID: 4154661312162119753}
   checkmarkImage: {fileID: 1856230409418558670}
-  difficulty: 0
 --- !u!1 &9092829406105516456
 GameObject:
   m_ObjectHideFlags: 0

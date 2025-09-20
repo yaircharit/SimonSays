@@ -20,17 +20,17 @@ public class Leaderboard : MonoBehaviour
     private Color hightlightColor = Color.yellow;
     [SerializeField]
     private TMP_Text titleTextObject;
-    private static List<PlayerScore> playerScores => repository.values.OrderByDescending(score => score.Score).ToList();
+    private static List<PlayerScore> playerScores => Repository.Values.OrderByDescending(score => score.Score).ToList();
     private Dictionary<PlayerScore, ScoreRow> rows;
     public static PlayerScore lastGame;
-    private static LeaderboardRepository<PlayerScore> repository => LeaderboardRepository<PlayerScore>.Instance;
+    private static LeaderboardRepository<PlayerScore> Repository => LeaderboardRepository<PlayerScore>.Instance;
     private string nextScene = "GameSetup";
 
     private void Start()
     {
         if ( lastGame != null )
         {
-            repository.SaveScoreAsync(lastGame);
+            Repository.SaveScoreAsync(lastGame);
             nextScene = "GameSetup";
         } else
         {
@@ -52,12 +52,12 @@ public class Leaderboard : MonoBehaviour
 
             row.Rank = rank++; // Rank
             row.PlayerName = score.PlayerName; // Player Name
-            row.Score = score.Score; // Score. Skipping index=2 cuz of Text component in Challenge Mode object
+            row.Score = score.Score; // Score.
 
             var difficultyComponent = row.ChallengeModeToggle;
-            difficultyComponent.SetDifficulty(score.Difficulty); // Set difficulty level and color
+            difficultyComponent.SetDifficulty(score.DifficultyIndex); // Set difficulty level and color
             difficultyComponent.IsOn = score.Challenge; // Set challanage mode indication
-            difficultyComponent.interactable = false;
+            difficultyComponent.Interactable = false;
 
             rows[score] = row;
         }
@@ -96,6 +96,6 @@ public class Leaderboard : MonoBehaviour
 
     public void OnApplicationQuit()
     {
-        repository.CloseConnection();
+        Repository.CloseConnection();
     }
 }
